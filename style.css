@@ -1,3387 +1,696 @@
-/* ===========================================
-   설천고 스포츠과학 훈련센터 PRO
-=========================================== */
-
-:root{
-
---bg:#07131f;
---bg2:#0d1b2a;
---card:#122538;
---card2:#17304a;
-
---blue:#00B7FF;
---cyan:#00E5FF;
---green:#30E08F;
---yellow:#FFD54A;
---red:#FF5A5A;
-
---white:#ffffff;
---gray:#9fb4c8;
-
---radius:18px;
-
---shadow:
-0 15px 40px rgba(0,0,0,.35);
-
---glass:
-rgba(255,255,255,.08);
-
-}
-
-/* ====================== */
+/*
+=========================================
+Seolcheon Sports Science Center PRO
+Style.css
+Version 1.0
+=========================================
+*/
 
 *{
 
-margin:0;
-padding:0;
-box-sizing:border-box;
+    margin:0;
 
-font-family:
-"Pretendard",
-sans-serif;
+    padding:0;
+
+    box-sizing:border-box;
+
+    font-family:
+    "Pretendard",
+    sans-serif;
 
 }
-
-/* ====================== */
 
 body{
 
-background:
+    background:#0b1220;
 
-linear-gradient(
-135deg,
-#061019,
-#0b2237,
-#081522
-);
+    color:#ffffff;
 
-color:white;
-
-min-height:100vh;
-
-overflow:hidden;
+    min-height:100vh;
 
 }
 
-/* ====================== */
+header{
 
-.container{
+    height:70px;
 
-display:flex;
+    display:flex;
 
-height:100vh;
+    align-items:center;
 
-}
+    justify-content:center;
 
-/* ====================== */
+    background:#111827;
 
-.page{
+    border-bottom:
 
-display:none;
-
-animation:fade .35s;
+    2px solid #1e293b;
 
 }
 
-.page.active{
+header h1{
 
-display:block;
+    font-size:28px;
 
-}
-
-@keyframes fade{
-
-from{
-
-opacity:0;
-transform:translateY(15px);
+    color:#00d4ff;
 
 }
 
-to{
+main{
 
-opacity:1;
-transform:none;
+    width:95%;
 
-}
+    margin:auto;
 
-}
-
-/* ====================== */
-
-h1{
-
-font-size:34px;
-
-font-weight:800;
-
-margin-bottom:25px;
+    padding:20px;
 
 }
 
-h2{
+.camera-panel{
 
-font-size:24px;
+    position:relative;
 
-margin-bottom:15px;
+    width:100%;
 
-}
+    height:600px;
 
-h3{
+    border-radius:16px;
 
-font-size:18px;
+    overflow:hidden;
 
-margin-bottom:12px;
-
-}
-/* ===========================================
-   TOP BAR
-=========================================== */
-
-.topbar{
-
-position:fixed;
-
-top:0;
-left:0;
-right:0;
-
-height:70px;
-
-display:flex;
-align-items:center;
-justify-content:space-between;
-
-padding:0 30px;
-
-background:rgba(7,19,31,.82);
-
-backdrop-filter:blur(18px);
-
-border-bottom:1px solid rgba(255,255,255,.08);
-
-z-index:999;
-
-box-shadow:
-0 6px 25px rgba(0,0,0,.25);
+    background:#000;
 
 }
 
-/* ====================== */
+#cameraVideo{
 
-.logo{
+    width:100%;
 
-display:flex;
-align-items:center;
-gap:12px;
+    height:100%;
 
-font-size:26px;
-
-font-weight:800;
-
-letter-spacing:.5px;
-
-color:white;
+    object-fit:cover;
 
 }
 
-.logo span{
+#poseCanvas{
 
-color:var(--blue);
+    position:absolute;
 
-}
+    top:0;
 
-/* ====================== */
+    left:0;
 
-.clock{
+    width:100%;
 
-padding:10px 18px;
-
-border-radius:14px;
-
-background:rgba(255,255,255,.06);
-
-font-size:18px;
-
-font-weight:700;
-
-color:var(--cyan);
-
-box-shadow:
-
-inset 0 0 12px rgba(255,255,255,.05),
-
-0 8px 18px rgba(0,0,0,.25);
+    height:100%;
 
 }
+/* ===================================== */
+/* Dashboard */
+/* ===================================== */
 
-/* ===========================================
-   SIDEBAR
-=========================================== */
+.dashboard-panel{
 
-.sidebar{
+    display:grid;
 
-position:fixed;
+    grid-template-columns:
 
-top:70px;
-left:0;
+    repeat(4,1fr);
 
-width:270px;
+    gap:20px;
 
-height:calc(100vh - 70px);
-
-background:
-
-linear-gradient(
-
-180deg,
-
-#0b1725,
-
-#12253b,
-
-#08131d
-
-);
-
-padding:25px 18px;
-
-overflow-y:auto;
-
-border-right:
-
-1px solid rgba(255,255,255,.08);
+    margin-top:20px;
 
 }
-
-/* ====================== */
-
-.sidebar::-webkit-scrollbar{
-
-width:6px;
-
-}
-
-.sidebar::-webkit-scrollbar-thumb{
-
-background:#1d4b72;
-
-border-radius:20px;
-
-}
-
-/* ====================== */
-
-.menu{
-
-width:100%;
-
-padding:18px;
-
-margin-bottom:12px;
-
-border:none;
-
-border-radius:15px;
-
-background:transparent;
-
-color:white;
-
-font-size:17px;
-
-font-weight:700;
-
-text-align:left;
-
-cursor:pointer;
-
-transition:.25s;
-
-display:flex;
-
-align-items:center;
-
-gap:14px;
-
-}
-
-/* ====================== */
-
-.menu:hover{
-
-background:
-
-rgba(0,183,255,.15);
-
-transform:translateX(8px);
-
-}
-
-/* ====================== */
-
-.menu.active{
-
-background:
-
-linear-gradient(
-
-90deg,
-
-#00B7FF,
-
-#008BFF
-
-);
-
-color:white;
-
-box-shadow:
-
-0 10px 30px
-
-rgba(0,183,255,.35);
-
-}
-
-/* ====================== */
-
-.menu i{
-
-width:22px;
-
-text-align:center;
-
-}
-
-/* ===========================================
-   CONTENT
-=========================================== */
-
-.content{
-
-margin-left:270px;
-
-margin-top:70px;
-
-padding:35px;
-
-height:calc(100vh - 70px);
-
-overflow-y:auto;
-
-}
-
-/* ====================== */
-
-.content::-webkit-scrollbar{
-
-width:8px;
-
-}
-
-.content::-webkit-scrollbar-thumb{
-
-background:#1b4d75;
-
-border-radius:20px;
-
-}
-/* ===========================================
-   CARD (Glass UI)
-=========================================== */
 
 .card{
 
-background:
+    background:#111827;
 
-linear-gradient(
-180deg,
-rgba(255,255,255,.08),
-rgba(255,255,255,.04)
-);
+    border:1px solid #1f2937;
 
-backdrop-filter:blur(18px);
+    border-radius:16px;
 
-border:
+    padding:20px;
 
-1px solid rgba(255,255,255,.08);
+    text-align:center;
 
-border-radius:22px;
-
-padding:24px;
-
-box-shadow:
-
-0 12px 35px rgba(0,0,0,.28);
-
-transition:.3s;
+    transition:.3s;
 
 }
 
 .card:hover{
 
-transform:translateY(-6px);
+    transform:translateY(-4px);
 
-box-shadow:
-
-0 18px 45px rgba(0,183,255,.18);
+    border-color:#00d4ff;
 
 }
-
-/* ===========================================
-   DASHBOARD GRID
-=========================================== */
-
-.dashboard-grid{
-
-display:grid;
-
-grid-template-columns:
-
-repeat(4,1fr);
-
-gap:22px;
-
-margin-bottom:28px;
-
-}
-
-/* ===========================================
-   BIG NUMBER
-=========================================== */
-
-.big-number{
-
-font-size:52px;
-
-font-weight:800;
-
-margin-top:15px;
-
-color:var(--cyan);
-
-text-shadow:
-
-0 0 15px rgba(0,229,255,.35);
-
-}
-
-/* ===========================================
-   CARD TITLE
-=========================================== */
 
 .card h3{
 
-color:#c8d9ea;
+    color:#94a3b8;
 
-font-size:18px;
+    font-size:15px;
 
-font-weight:700;
-
-margin-bottom:8px;
+    margin-bottom:10px;
 
 }
 
-/* ===========================================
-   AI ANALYSIS CARD
-=========================================== */
+.card h1{
 
-.analysis-card{
+    font-size:38px;
 
-margin-top:24px;
-
-padding:24px;
-
-border-radius:22px;
-
-background:
-
-linear-gradient(
-
-135deg,
-
-rgba(0,183,255,.16),
-
-rgba(0,229,255,.08)
-
-);
-
-border:
-
-1px solid rgba(0,229,255,.25);
-
-box-shadow:
-
-0 10px 35px rgba(0,183,255,.15);
+    color:#00d4ff;
 
 }
 
-.analysis-card h3{
+/* ===================================== */
+/* Analysis */
+/* ===================================== */
 
-font-size:20px;
+.analysis-panel{
 
-margin-bottom:15px;
+    display:grid;
 
-color:var(--cyan);
+    grid-template-columns:
 
-}
+    repeat(2,1fr);
 
-.analysis-card p{
+    gap:20px;
 
-line-height:1.8;
-
-font-size:15px;
-
-color:#dbe7f3;
+    margin-top:25px;
 
 }
 
-/* ===========================================
-   DASHBOARD CHART
-=========================================== */
+.chart-card{
 
-.dashboard-chart{
+    background:#111827;
 
-margin-top:30px;
+    border-radius:16px;
 
-background:var(--card);
+    padding:20px;
 
-border-radius:24px;
+    height:360px;
 
-padding:25px;
-
-box-shadow:var(--shadow);
-
-height:420px;
+    border:1px solid #1f2937;
 
 }
 
-/* ===========================================
-   BOTTOM AREA
-=========================================== */
+.chart-card canvas{
 
-.dashboard-bottom{
+    width:100% !important;
 
-margin-top:30px;
-
-display:grid;
-
-grid-template-columns:
-
-2fr 1fr;
-
-gap:24px;
+    height:100% !important;
 
 }
 
-/* ===========================================
-   RECENT LIST
-=========================================== */
+/* ===================================== */
+/* Feedback */
+/* ===================================== */
 
-#recentTrainingList{
+.feedback-panel{
 
-list-style:none;
+    margin-top:25px;
 
-display:flex;
+    background:#111827;
 
-flex-direction:column;
+    border-radius:16px;
 
-gap:12px;
-
-}
-
-#recentTrainingList li{
-
-padding:16px;
-
-border-radius:14px;
-
-background:rgba(255,255,255,.05);
-
-transition:.25s;
+    padding:20px;
 
 }
 
-#recentTrainingList li:hover{
+.feedback{
 
-background:
+    padding:15px;
 
-rgba(0,183,255,.15);
+    margin-top:12px;
 
-transform:translateX(6px);
+    border-left:5px solid #00d4ff;
 
-}
+    background:#1e293b;
 
-/* ===========================================
-   TODAY SUMMARY
-=========================================== */
-
-#todaySummary{
-
-font-size:16px;
-
-line-height:1.8;
-
-color:#d5e3ef;
+    border-radius:10px;
 
 }
 
-/* ===========================================
-   RESPONSIVE
-=========================================== */
+.feedback h4{
 
-@media(max-width:1300px){
+    color:#38bdf8;
 
-.dashboard-grid{
-
-grid-template-columns:
-
-repeat(2,1fr);
+    margin-bottom:6px;
 
 }
 
-.dashboard-bottom{
+.feedback p{
 
-grid-template-columns:1fr;
-
-}
+    color:#e2e8f0;
 
 }
 
-@media(max-width:800px){
+/* ===================================== */
+/* Recommendation */
+/* ===================================== */
 
-.dashboard-grid{
+.recommend-panel{
 
-grid-template-columns:1fr;
+    margin-top:25px;
 
-}
+    background:#111827;
 
-.content{
+    padding:20px;
 
-padding:18px;
-
-}
-
-.big-number{
-
-font-size:42px;
+    border-radius:16px;
 
 }
 
-}
-/* ===========================================
-   FORM
-=========================================== */
+.plan{
 
-.form-grid{
+    padding:15px;
 
-display:grid;
+    background:#1e293b;
 
-grid-template-columns:
+    margin-top:10px;
 
-repeat(auto-fit,minmax(240px,1fr));
-
-gap:18px;
-
-margin-bottom:25px;
+    border-radius:10px;
 
 }
 
-/* ====================== */
+.plan b{
 
-input,
-select,
-textarea{
+    color:#22c55e;
 
-width:100%;
+}
+/* ===================================== */
+/* Athlete */
+/* ===================================== */
 
-padding:15px 18px;
+.athlete-panel{
 
-border:none;
+    margin-top:25px;
 
-outline:none;
+    background:#111827;
 
-border-radius:15px;
+    border-radius:16px;
 
-background:
-
-rgba(255,255,255,.08);
-
-color:white;
-
-font-size:15px;
-
-transition:.25s;
-
-border:
-
-1px solid transparent;
+    padding:20px;
 
 }
 
-input::placeholder,
-textarea::placeholder{
+.athlete-panel table{
 
-color:#9fb4c8;
+    width:100%;
 
-}
-
-input:focus,
-select:focus,
-textarea:focus{
-
-border-color:var(--cyan);
-
-box-shadow:
-
-0 0 18px rgba(0,229,255,.25);
-
-background:
-
-rgba(255,255,255,.12);
+    border-collapse:collapse;
 
 }
 
-/* ====================== */
+.athlete-panel td{
 
-textarea{
+    padding:14px;
 
-resize:vertical;
+    border-bottom:
 
-min-height:120px;
-
-}
-
-/* ===========================================
-   BUTTON
-=========================================== */
-
-.button-group{
-
-display:flex;
-
-gap:15px;
-
-margin-top:20px;
-
-margin-bottom:25px;
-
-flex-wrap:wrap;
+    1px solid #334155;
 
 }
 
-.button-group button,
+.athlete-panel td:first-child{
+
+    width:180px;
+
+    color:#94a3b8;
+
+    font-weight:600;
+
+}
+
+/* ===================================== */
+/* Sports */
+/* ===================================== */
+
+.sports-panel{
+
+    margin-top:25px;
+
+    background:#111827;
+
+    padding:20px;
+
+    border-radius:16px;
+
+}
+
+.sports-grid{
+
+    display:grid;
+
+    grid-template-columns:
+
+    repeat(auto-fill,minmax(170px,1fr));
+
+    gap:15px;
+
+    margin-top:20px;
+
+}
+
+.sport-card{
+
+    background:#1e293b;
+
+    border:1px solid #334155;
+
+    border-radius:12px;
+
+    padding:18px;
+
+    cursor:pointer;
+
+    text-align:center;
+
+    transition:.25s;
+
+}
+
+.sport-card:hover{
+
+    background:#2563eb;
+
+    border-color:#38bdf8;
+
+    transform:scale(1.04);
+
+}
+
+/* ===================================== */
+/* Ranking */
+/* ===================================== */
+
+.ranking-panel{
+
+    margin-top:25px;
+
+    background:#111827;
+
+    padding:20px;
+
+    border-radius:16px;
+
+}
+
+.ranking-item{
+
+    display:grid;
+
+    grid-template-columns:
+
+    70px
+
+    1fr
+
+    90px;
+
+    padding:14px;
+
+    margin-top:10px;
+
+    border-radius:10px;
+
+    background:#1e293b;
+
+}
+
+.ranking-item span:last-child{
+
+    text-align:right;
+
+    color:#00d4ff;
+
+    font-weight:bold;
+
+}
+
+/* ===================================== */
+/* Summary */
+/* ===================================== */
+
+.summary-panel{
+
+    display:grid;
+
+    grid-template-columns:
+
+    repeat(3,1fr);
+
+    gap:20px;
+
+    margin-top:25px;
+
+}
+
+.summary-card{
+
+    background:#111827;
+
+    border-radius:16px;
+
+    padding:20px;
+
+    text-align:center;
+
+}
+
+.summary-card h1{
+
+    margin-top:12px;
+
+    font-size:34px;
+
+    color:#22d3ee;
+
+}
+
+.summary-card p{
+
+    margin-top:12px;
+
+    color:#cbd5e1;
+
+    line-height:1.6;
+
+}
+/* ===================================== */
+/* History */
+/* ===================================== */
+
+.history-panel{
+
+    margin-top:25px;
+
+    background:#111827;
+
+    padding:20px;
+
+    border-radius:16px;
+
+}
+
+#recentAnalysis{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+}
+
+.recent-item{
+
+    display:grid;
+
+    grid-template-columns:
+
+    1fr
+
+    100px
+
+    80px;
+
+    padding:15px;
+
+    border-radius:10px;
+
+    background:#1e293b;
+
+    border-left:4px solid #22d3ee;
+
+}
+
+/* ===================================== */
+/* Training */
+/* ===================================== */
+
+.training-panel{
+
+    margin-top:25px;
+
+    background:#111827;
+
+    border-radius:16px;
+
+    padding:20px;
+
+}
+
+.training-panel div{
+
+    margin-top:10px;
+
+    font-size:18px;
+
+}
+
+/* ===================================== */
+/* Button */
+/* ===================================== */
+
 button{
 
-cursor:pointer;
+    background:#2563eb;
 
-border:none;
+    color:#fff;
 
-padding:14px 24px;
+    border:none;
 
-border-radius:14px;
+    border-radius:10px;
 
-font-size:15px;
+    padding:12px 24px;
 
-font-weight:700;
+    cursor:pointer;
 
-transition:.25s;
+    transition:.25s;
 
 }
 
-/* 저장 */
+button:hover{
 
-button.primary,
-#saveAthleteButton,
-#saveSportsRecordButton,
-#saveWeightRecordButton,
-#savePoseRecordButton{
+    background:#1d4ed8;
 
-background:
+    transform:translateY(-2px);
 
-linear-gradient(
-135deg,
-#00B7FF,
-#0078FF
-);
-
-color:white;
-
-}
-
-button.primary:hover,
-#saveAthleteButton:hover,
-#saveSportsRecordButton:hover,
-#saveWeightRecordButton:hover,
-#savePoseRecordButton:hover{
-
-transform:translateY(-3px);
-
-box-shadow:
-
-0 10px 25px rgba(0,183,255,.35);
-
-}
-
-/* 초기화 */
-
-button.secondary,
-#resetAthleteButton,
-#resetSportsFormButton,
-#resetWeightFormButton{
-
-background:#33495f;
-
-color:white;
-
-}
-
-button.secondary:hover{
-
-background:#476178;
-
-}
-
-/* 삭제 */
-
-button.danger{
-
-background:#d83a3a;
-
-color:white;
-
-}
-
-button.danger:hover{
-
-background:#ff5656;
-
-}
-
-/* ===========================================
-   TABLE
-=========================================== */
-
-.table{
-
-width:100%;
-
-border-collapse:collapse;
-
-margin-top:25px;
-
-overflow:hidden;
-
-border-radius:18px;
-
-background:
-
-rgba(255,255,255,.05);
-
-}
-
-/* ====================== */
-
-.table thead{
-
-background:
-
-linear-gradient(
-90deg,
-#0b5da8,
-#0094ff
-);
-
-}
-
-.table th{
-
-padding:18px;
-
-font-size:15px;
-
-font-weight:700;
-
-color:white;
-
-text-align:center;
-
-}
-
-/* ====================== */
-
-.table td{
-
-padding:16px;
-
-text-align:center;
-
-border-bottom:
-
-1px solid rgba(255,255,255,.08);
-
-}
-
-/* ====================== */
-
-.table tbody tr{
-
-transition:.25s;
-
-}
-
-.table tbody tr:hover{
-
-background:
-
-rgba(0,183,255,.12);
-
-}
-
-/* ====================== */
-
-.table button{
-
-padding:8px 14px;
-
-font-size:13px;
-
-}
-
-/* ===========================================
-   EMPTY
-=========================================== */
-
-.empty-box{
-
-padding:60px;
-
-text-align:center;
-
-color:#9fb4c8;
-
-}
-
-.empty-box i{
-
-font-size:70px;
-
-margin-bottom:20px;
-
-display:block;
-
-}
-
-/* ===========================================
-   BADGE
-=========================================== */
-
-.badge{
-
-display:inline-block;
-
-padding:6px 12px;
-
-border-radius:30px;
-
-font-size:13px;
-
-font-weight:700;
-
-}
-
-.badge.blue{
-
-background:#00B7FF;
-
-color:white;
-
-}
-
-.badge.green{
-
-background:#28c76f;
-
-color:white;
-
-}
-
-.badge.red{
-
-background:#ff5a5a;
-
-color:white;
-
-}
-/* ===========================================
-   AI CAMERA
-=========================================== */
-
-.camera-layout{
-
-display:grid;
-
-grid-template-columns:2fr 420px;
-
-gap:30px;
-
-align-items:flex-start;
-
-margin-top:20px;
-
-}
-
-/* ===========================================
-   CAMERA BOX
-=========================================== */
-
-.camera-box{
-
-position:relative;
-
-width:100%;
-
-aspect-ratio:16/9;
-
-border-radius:24px;
-
-overflow:hidden;
-
-background:#000;
-
-border:2px solid rgba(0,183,255,.3);
-
-box-shadow:
-
-0 0 40px rgba(0,183,255,.15);
-
-}
-
-/* ====================== */
-
-#cameraVideo{
-
-position:absolute;
-
-width:100%;
-
-height:100%;
-
-object-fit:cover;
-
-z-index:1;
-
-}
-
-/* ====================== */
-
-#poseCanvas{
-
-position:absolute;
-
-left:0;
-top:0;
-
-width:100%;
-height:100%;
-
-z-index:3;
-
-pointer-events:none;
-
-}
-
-/* ====================== */
-
-#captureCanvas{
-
-display:none;
-
-}
-
-/* ===========================================
-   기준선
-=========================================== */
-
-.camera-box::before{
-
-content:"";
-
-position:absolute;
-
-left:50%;
-
-top:0;
-
-width:3px;
-
-height:100%;
-
-background:
-
-rgba(0,255,255,.6);
-
-z-index:2;
-
-}
-
-.camera-box::after{
-
-content:"";
-
-position:absolute;
-
-top:50%;
-
-left:0;
-
-width:100%;
-
-height:3px;
-
-background:
-
-rgba(255,255,255,.35);
-
-z-index:2;
-
-}
-
-/* ===========================================
-   AI PANEL
-=========================================== */
-
-.camera-control{
-
-display:flex;
-
-flex-direction:column;
-
-gap:18px;
-
-}
-
-/* ===========================================
-   SCORE CARD
-=========================================== */
-
-.score-card{
-
-padding:25px;
-
-border-radius:20px;
-
-background:
-
-linear-gradient(
-
-135deg,
-
-rgba(0,183,255,.15),
-
-rgba(0,229,255,.08)
-
-);
-
-border:
-
-1px solid rgba(0,229,255,.25);
-
-text-align:center;
-
-}
-
-.score-card h2{
-
-margin-bottom:15px;
-
-font-size:22px;
-
-}
-
-#poseScore{
-
-font-size:68px;
-
-font-weight:800;
-
-color:#00E5FF;
-
-text-shadow:
-
-0 0 20px rgba(0,229,255,.45);
-
-}
-
-/* ===========================================
-   FEEDBACK
-=========================================== */
-
-.feedback-card{
-
-padding:20px;
-
-border-radius:18px;
-
-background:
-
-rgba(255,255,255,.05);
-
-}
-
-.feedback-card h3{
-
-margin-bottom:15px;
-
-}
-
-#poseFeedbackList{
-
-list-style:none;
-
-display:flex;
-
-flex-direction:column;
-
-gap:12px;
-
-}
-
-#poseFeedbackList li{
-
-padding:12px;
-
-border-radius:12px;
-
-background:
-
-rgba(255,255,255,.06);
-
-border-left:
-
-5px solid #00B7FF;
-
-}
-
-/* ===========================================
-   ANGLE CARD
-=========================================== */
-
-.angle-card{
-
-padding:20px;
-
-border-radius:18px;
-
-background:
-
-rgba(255,255,255,.05);
-
-}
-
-.angle-item{
-
-display:flex;
-
-justify-content:space-between;
-
-padding:12px 0;
-
-border-bottom:
-
-1px solid rgba(255,255,255,.08);
-
-}
-
-.angle-item:last-child{
-
-border:none;
-
-}
-
-.angle-value{
-
-font-weight:800;
-
-color:#00E5FF;
-
-}
-
-/* ===========================================
-   STATUS
-=========================================== */
-
-.status-good{
-
-color:#29d17c;
-
-font-weight:700;
-
-}
-
-.status-warning{
-
-color:#ffd54a;
-
-font-weight:700;
-
-}
-
-.status-danger{
-
-color:#ff5a5a;
-
-font-weight:700;
-
-}
-
-/* ===========================================
-   CAMERA BUTTON
-=========================================== */
-
-#startCameraButton{
-
-background:
-
-linear-gradient(
-135deg,
-#00C853,
-#00A843
-);
-
-color:white;
-
-}
-
-#stopCameraButton{
-
-background:
-
-linear-gradient(
-135deg,
-#FF5252,
-#D32F2F
-);
-
-color:white;
-
-}
-
-#savePoseRecordButton{
-
-background:
-
-linear-gradient(
-135deg,
-#00B7FF,
-#006CFF
-);
-
-color:white;
-
-}
-
-#startCameraButton:hover,
-#stopCameraButton:hover,
-#savePoseRecordButton:hover{
-
-transform:translateY(-3px);
-
-box-shadow:
-
-0 12px 25px rgba(0,0,0,.25);
-
-}
-
-/* ===========================================
-   MOBILE
-=========================================== */
-
-@media(max-width:1200px){
-
-.camera-layout{
-
-grid-template-columns:1fr;
-
-}
-
-}
-/* ===========================================
-   SPORTS SCIENCE PANEL
-=========================================== */
-
-.science-grid{
-
-display:grid;
-
-grid-template-columns:repeat(4,1fr);
-
-gap:20px;
-
-margin-top:25px;
-
-}
-
-/* ====================== */
-
-.science-card{
-
-background:
-
-linear-gradient(
-180deg,
-rgba(255,255,255,.08),
-rgba(255,255,255,.04)
-);
-
-border-radius:20px;
-
-padding:22px;
-
-border:1px solid rgba(255,255,255,.08);
-
-transition:.3s;
-
-box-shadow:
-
-0 10px 30px rgba(0,0,0,.22);
-
-}
-
-.science-card:hover{
-
-transform:translateY(-6px);
-
-box-shadow:
-
-0 15px 35px rgba(0,183,255,.25);
-
-}
-
-/* ====================== */
-
-.science-title{
-
-font-size:17px;
-
-font-weight:700;
-
-color:#c9d8e7;
-
-margin-bottom:15px;
-
-}
-
-/* ====================== */
-
-.science-value{
-
-font-size:46px;
-
-font-weight:800;
-
-color:#00E5FF;
-
-margin-bottom:8px;
-
-}
-
-/* ====================== */
-
-.science-unit{
-
-font-size:15px;
-
-color:#9fb4c8;
-
-}
-
-/* ===========================================
-   STATUS BAR
-=========================================== */
-
-.progress{
-
-width:100%;
-
-height:12px;
-
-background:rgba(255,255,255,.08);
-
-border-radius:30px;
-
-overflow:hidden;
-
-margin-top:15px;
-
-}
-
-.progress div{
-
-height:100%;
-
-border-radius:30px;
-
-background:
-
-linear-gradient(
-
-90deg,
-
-#00E5FF,
-
-#00B7FF,
-
-#007BFF
-
-);
-
-transition:.4s;
-
-}
-
-/* ===========================================
-   ANGLE TABLE
-=========================================== */
-
-.angle-table{
-
-margin-top:25px;
-
-border-radius:18px;
-
-overflow:hidden;
-
-background:rgba(255,255,255,.05);
-
-}
-
-.angle-row{
-
-display:grid;
-
-grid-template-columns:
-
-2fr 1fr 1fr;
-
-padding:15px 20px;
-
-border-bottom:
-
-1px solid rgba(255,255,255,.08);
-
-align-items:center;
-
-}
-
-.angle-row:last-child{
-
-border:none;
-
-}
-
-.angle-row:nth-child(even){
-
-background:rgba(255,255,255,.03);
-
-}
-
-/* ===========================================
-   ANGLE VALUE
-=========================================== */
-
-.angle-score{
-
-font-size:20px;
-
-font-weight:700;
-
-color:#00E5FF;
-
-}
-
-.good{
-
-color:#29D17C;
-
-font-weight:700;
-
-}
-
-.normal{
-
-color:#FFD54A;
-
-font-weight:700;
-
-}
-
-.bad{
-
-color:#FF5A5A;
-
-font-weight:700;
-
-}
-
-/* ===========================================
-   AI RESULT
-=========================================== */
-
-.ai-result{
-
-margin-top:25px;
-
-padding:22px;
-
-border-radius:20px;
-
-background:
-
-linear-gradient(
-
-135deg,
-
-rgba(0,183,255,.18),
-
-rgba(0,229,255,.08)
-
-);
-
-border:
-
-1px solid rgba(0,229,255,.25);
-
-}
-
-.ai-result h2{
-
-margin-bottom:15px;
-
-}
-
-.ai-result p{
-
-line-height:1.8;
-
-color:#dce8f3;
-
-}
-
-/* ===========================================
-   LIVE GRAPH
-=========================================== */
-
-.live-chart{
-
-margin-top:25px;
-
-height:260px;
-
-background:rgba(255,255,255,.05);
-
-border-radius:20px;
-
-padding:20px;
-
-}
-
-/* ===========================================
-   BODY BALANCE
-=========================================== */
-
-.balance{
-
-display:flex;
-
-align-items:center;
-
-justify-content:space-between;
-
-margin-top:18px;
-
-}
-
-.balance-left{
-
-color:#00E5FF;
-
-font-weight:700;
-
-}
-
-.balance-right{
-
-color:#FFD54A;
-
-font-weight:700;
-
-}
-
-/* ===========================================
-   BODY CENTER
-=========================================== */
-
-.center-mass{
-
-width:140px;
-
-height:140px;
-
-margin:20px auto;
-
-border-radius:50%;
-
-border:2px solid rgba(255,255,255,.18);
-
-position:relative;
-
-}
-
-.center-dot{
-
-width:18px;
-
-height:18px;
-
-background:#00E5FF;
-
-border-radius:50%;
-
-position:absolute;
-
-left:50%;
-
-top:50%;
-
-transform:translate(-50%,-50%);
-
-box-shadow:
-
-0 0 18px rgba(0,229,255,.55);
-
-}
-
-/* ===========================================
-   RESPONSIVE
-=========================================== */
-
-@media(max-width:1300px){
-
-.science-grid{
-
-grid-template-columns:repeat(2,1fr);
-
-}
-
-}
-
-@media(max-width:700px){
-
-.science-grid{
-
-grid-template-columns:1fr;
-
-}
-
-.angle-row{
-
-grid-template-columns:1fr;
-
-gap:10px;
-
-}
-
-}
-/* ===========================================
-   VIDEO ANALYSIS
-=========================================== */
-
-.video-analysis{
-
-display:grid;
-
-grid-template-columns:2fr 380px;
-
-gap:28px;
-
-margin-top:25px;
-
-}
-
-/* ====================== */
-
-.video-box{
-
-position:relative;
-
-background:#000;
-
-border-radius:24px;
-
-overflow:hidden;
-
-aspect-ratio:16/9;
-
-border:2px solid rgba(0,183,255,.25);
-
-box-shadow:
-
-0 0 35px rgba(0,183,255,.18);
-
-}
-
-/* ====================== */
-
-.video-box video{
-
-width:100%;
-
-height:100%;
-
-object-fit:contain;
-
-background:#000;
-
-}
-
-/* ====================== */
-
-.video-overlay{
-
-position:absolute;
-
-left:0;
-
-top:0;
-
-width:100%;
-
-height:100%;
-
-pointer-events:none;
-
-}
-
-/* ===========================================
-   GUIDE LINE
-=========================================== */
-
-.guide-line-v{
-
-position:absolute;
-
-left:50%;
-
-top:0;
-
-width:2px;
-
-height:100%;
-
-background:#00E5FF;
-
-opacity:.8;
-
-}
-
-.guide-line-h{
-
-position:absolute;
-
-top:50%;
-
-left:0;
-
-width:100%;
-
-height:2px;
-
-background:white;
-
-opacity:.35;
-
-}
-
-/* ===========================================
-   VIDEO CONTROL
-=========================================== */
-
-.video-control{
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-gap:12px;
-
-margin-top:20px;
-
-flex-wrap:wrap;
-
-}
-
-.video-control button{
-
-width:54px;
-
-height:54px;
-
-border-radius:50%;
-
-border:none;
-
-cursor:pointer;
-
-background:
-
-rgba(255,255,255,.08);
-
-color:white;
-
-font-size:20px;
-
-transition:.25s;
-
-}
-
-.video-control button:hover{
-
-background:#00B7FF;
-
-transform:scale(1.08);
-
-}
-
-/* ===========================================
-   TIME BAR
-=========================================== */
-
-.timeline{
-
-margin-top:18px;
-
-width:100%;
-
-height:8px;
-
-border-radius:30px;
-
-background:
-
-rgba(255,255,255,.08);
-
-overflow:hidden;
-
-}
-
-.timeline div{
-
-height:100%;
-
-width:0%;
-
-background:
-
-linear-gradient(
-
-90deg,
-
-#00E5FF,
-
-#00B7FF
-
-);
-
-}
-
-/* ===========================================
-   FRAME INFO
-=========================================== */
-
-.frame-info{
-
-display:flex;
-
-justify-content:space-between;
-
-margin-top:15px;
-
-font-size:14px;
-
-color:#b6c9d9;
-
-}
-
-/* ===========================================
-   SIDE PANEL
-=========================================== */
-
-.analysis-side{
-
-display:flex;
-
-flex-direction:column;
-
-gap:18px;
-
-}
-
-/* ====================== */
-
-.analysis-item{
-
-padding:18px;
-
-border-radius:18px;
-
-background:
-
-rgba(255,255,255,.05);
-
-}
-
-.analysis-item h3{
-
-margin-bottom:12px;
-
-font-size:17px;
-
-}
-
-.analysis-item p{
-
-line-height:1.8;
-
-color:#d8e4ef;
-
-}
-
-/* ===========================================
-   SCORE BAR
-=========================================== */
-
-.score-bar{
-
-margin-top:12px;
-
-height:12px;
-
-border-radius:30px;
-
-overflow:hidden;
-
-background:
-
-rgba(255,255,255,.08);
-
-}
-
-.score-fill{
-
-height:100%;
-
-width:88%;
-
-background:
-
-linear-gradient(
-
-90deg,
-
-#29D17C,
-
-#00E5FF
-
-);
-
-}
-
-/* ===========================================
-   MOTION PATH
-=========================================== */
-
-.motion-path{
-
-width:100%;
-
-height:220px;
-
-border-radius:20px;
-
-background:
-
-rgba(255,255,255,.05);
-
-margin-top:20px;
-
-}
-
-/* ===========================================
-   SNAPSHOT
-=========================================== */
-
-.snapshot-list{
-
-display:grid;
-
-grid-template-columns:repeat(3,1fr);
-
-gap:12px;
-
-margin-top:20px;
-
-}
-
-.snapshot{
-
-aspect-ratio:16/9;
-
-border-radius:12px;
-
-overflow:hidden;
-
-background:#111;
-
-border:2px solid rgba(255,255,255,.08);
-
-transition:.25s;
-
-}
-
-.snapshot:hover{
-
-border-color:#00E5FF;
-
-transform:scale(1.04);
-
-}
-
-/* ===========================================
-   RESPONSIVE
-=========================================== */
-
-@media(max-width:1200px){
-
-.video-analysis{
-
-grid-template-columns:1fr;
-
-}
-
-.snapshot-list{
-
-grid-template-columns:repeat(2,1fr);
-
-}
-
-}
-
-@media(max-width:700px){
-
-.snapshot-list{
-
-grid-template-columns:1fr;
-
-}
-
-.video-control{
-
-gap:8px;
-
-}
-
-.video-control button{
-
-width:48px;
-
-height:48px;
-
-}
-
-}
-/* ===========================================
-   ELITE SPORTS SCIENCE
-=========================================== */
-
-.performance-grid{
-
-display:grid;
-
-grid-template-columns:repeat(4,1fr);
-
-gap:20px;
-
-margin-top:25px;
-
-}
-
-/* ====================== */
-
-.metric-card{
-
-position:relative;
-
-overflow:hidden;
-
-padding:24px;
-
-border-radius:22px;
-
-background:
-
-linear-gradient(
-
-180deg,
-
-rgba(255,255,255,.08),
-
-rgba(255,255,255,.04)
-
-);
-
-border:1px solid rgba(255,255,255,.08);
-
-transition:.3s;
-
-}
-
-/* ====================== */
-
-.metric-card::before{
-
-content:"";
-
-position:absolute;
-
-top:-70px;
-right:-70px;
-
-width:160px;
-height:160px;
-
-border-radius:50%;
-
-background:
-
-rgba(0,183,255,.08);
-
-}
-
-/* ====================== */
-
-.metric-card:hover{
-
-transform:translateY(-8px);
-
-box-shadow:
-
-0 20px 45px rgba(0,183,255,.20);
-
-}
-
-/* ====================== */
-
-.metric-title{
-
-font-size:16px;
-
-color:#a8bfd4;
-
-margin-bottom:15px;
-
-}
-
-/* ====================== */
-
-.metric-value{
-
-font-size:48px;
-
-font-weight:800;
-
-color:#00E5FF;
-
-line-height:1;
-
-}
-
-/* ====================== */
-
-.metric-unit{
-
-margin-top:8px;
-
-font-size:15px;
-
-color:#9fb4c8;
-
-}
-
-/* ===========================================
-   HEART RATE
-=========================================== */
-
-.heart{
-
-color:#ff4d6d;
-
-animation:heartBeat 1s infinite;
-
-}
-
-@keyframes heartBeat{
-
-0%{
-
-transform:scale(1);
-
-}
-
-30%{
-
-transform:scale(1.15);
-
-}
-
-60%{
-
-transform:scale(.95);
-
-}
-
-100%{
-
-transform:scale(1);
-
-}
-
-}
-
-/* ===========================================
-   SPEED
-=========================================== */
-
-.speed{
-
-color:#00E5FF;
-
-}
-
-/* ===========================================
-   POWER
-=========================================== */
-
-.power{
-
-color:#FFD54A;
-
-}
-
-/* ===========================================
-   CALORIES
-=========================================== */
-
-.calories{
-
-color:#ff8f00;
-
-}
-
-/* ===========================================
-   AI SCORE
-=========================================== */
-
-.ai-score{
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-width:180px;
-
-height:180px;
-
-margin:30px auto;
-
-border-radius:50%;
-
-background:
-
-conic-gradient(
-
-#00E5FF 0deg,
-
-#00B7FF 280deg,
-
-rgba(255,255,255,.08) 280deg
-
-);
-
-position:relative;
-
-}
-
-.ai-score::after{
-
-content:"";
-
-position:absolute;
-
-width:145px;
-
-height:145px;
-
-border-radius:50%;
-
-background:#0f1c2a;
-
-}
-
-/* ====================== */
-
-.ai-score span{
-
-position:relative;
-
-z-index:10;
-
-font-size:46px;
-
-font-weight:800;
-
-color:white;
-
-}
-
-/* ===========================================
-   GRADE
-=========================================== */
-
-.grade{
-
-text-align:center;
-
-margin-top:15px;
-
-font-size:26px;
-
-font-weight:800;
-
-letter-spacing:1px;
-
-}
-
-.grade.a{
-
-color:#29D17C;
-
-}
-
-.grade.b{
-
-color:#FFD54A;
-
-}
-
-.grade.c{
-
-color:#FF5A5A;
-
-}
-
-/* ===========================================
-   COMPARISON
-=========================================== */
-
-.compare-box{
-
-margin-top:30px;
-
-padding:20px;
-
-border-radius:20px;
-
-background:
-
-rgba(255,255,255,.05);
-
-}
-
-.compare-row{
-
-display:flex;
-
-justify-content:space-between;
-
-padding:15px 0;
-
-border-bottom:
-
-1px solid rgba(255,255,255,.08);
-
-}
-
-.compare-row:last-child{
-
-border:none;
-
-}
-
-/* ===========================================
-   NATIONAL LEVEL
-=========================================== */
-
-.level-national{
-
-color:#29D17C;
-
-font-weight:700;
-
-}
-
-.level-good{
-
-color:#00E5FF;
-
-font-weight:700;
-
-}
-
-.level-normal{
-
-color:#FFD54A;
-
-font-weight:700;
-
-}
-
-.level-low{
-
-color:#FF5A5A;
-
-font-weight:700;
-
-}
-
-/* ===========================================
-   RESPONSIVE
-=========================================== */
-
-@media(max-width:1300px){
-
-.performance-grid{
-
-grid-template-columns:repeat(2,1fr);
-
-}
-
-}
-
-@media(max-width:700px){
-
-.performance-grid{
-
-grid-template-columns:1fr;
-
-}
-
-.metric-value{
-
-font-size:40px;
-
-}
-
-.ai-score{
-
-width:150px;
-
-height:150px;
-
-}
-
-.ai-score::after{
-
-width:120px;
-
-height:120px;
-
-}
-
-}
-/* ===========================================
-   AI LIVE ANALYSIS
-=========================================== */
-
-.ai-live{
-
-position:absolute;
-
-left:20px;
-
-top:20px;
-
-display:flex;
-
-align-items:center;
-
-gap:12px;
-
-padding:10px 18px;
-
-border-radius:40px;
-
-background:rgba(0,0,0,.45);
-
-backdrop-filter:blur(10px);
-
-z-index:50;
-
-}
-
-.ai-dot{
-
-width:12px;
-
-height:12px;
-
-border-radius:50%;
-
-background:#00ff88;
-
-animation:pulse 1.2s infinite;
-
-}
-
-@keyframes pulse{
-
-0%{
-
-transform:scale(.8);
-
-opacity:.5;
-
-}
-
-50%{
-
-transform:scale(1.3);
-
-opacity:1;
-
-}
-
-100%{
-
-transform:scale(.8);
-
-opacity:.5;
-
-}
-
-}
-
-.ai-live span{
-
-font-size:14px;
-
-font-weight:700;
-
-color:white;
-
-}
-
-/* ===========================================
-   REC
-=========================================== */
-
-.rec{
-
-position:absolute;
-
-top:20px;
-
-right:20px;
-
-display:flex;
-
-align-items:center;
-
-gap:8px;
-
-padding:10px 18px;
-
-border-radius:30px;
-
-background:rgba(255,0,0,.15);
-
-border:1px solid rgba(255,0,0,.4);
-
-color:#ff5555;
-
-font-weight:700;
-
-z-index:50;
-
-}
-
-.rec-dot{
-
-width:12px;
-
-height:12px;
-
-border-radius:50%;
-
-background:#ff3333;
-
-animation:blink .9s infinite;
-
-}
-
-@keyframes blink{
-
-50%{
-
-opacity:.2;
-
-}
-
-}
-
-/* ===========================================
-   FPS
-=========================================== */
-
-.fps-box{
-
-position:absolute;
-
-left:20px;
-
-bottom:20px;
-
-padding:12px 18px;
-
-border-radius:16px;
-
-background:rgba(0,0,0,.45);
-
-color:#00E5FF;
-
-font-weight:700;
-
-font-size:15px;
-
-z-index:50;
-
-}
-
-/* ===========================================
-   ANGLE LABEL
-=========================================== */
-
-.angle-label{
-
-position:absolute;
-
-padding:6px 10px;
-
-border-radius:8px;
-
-background:#00B7FF;
-
-color:white;
-
-font-size:13px;
-
-font-weight:700;
-
-box-shadow:
-
-0 5px 15px rgba(0,183,255,.35);
-
-}
-
-/* ===========================================
-   JOINT POINT
-=========================================== */
-
-.joint{
-
-position:absolute;
-
-width:12px;
-
-height:12px;
-
-border-radius:50%;
-
-background:#00E5FF;
-
-box-shadow:
-
-0 0 15px rgba(0,229,255,.7);
-
-}
-
-/* ===========================================
-   BODY CENTER
-=========================================== */
-
-.center-point{
-
-position:absolute;
-
-width:18px;
-
-height:18px;
-
-border-radius:50%;
-
-background:#FFD54A;
-
-border:3px solid white;
-
-box-shadow:
-
-0 0 20px rgba(255,213,74,.6);
-
-}
-
-/* ===========================================
-   BALANCE LINE
-=========================================== */
-
-.balance-line{
-
-position:absolute;
-
-width:2px;
-
-height:100%;
-
-background:
-
-linear-gradient(
-
-180deg,
-
-transparent,
-
-#00E5FF,
-
-transparent
-
-);
-
-left:50%;
-
-top:0;
-
-opacity:.7;
-
-}
-
-/* ===========================================
-   SKELETON COLORS
-=========================================== */
-
-.skeleton-good{
-
-stroke:#29D17C;
-
-stroke-width:5;
-
-}
-
-.skeleton-warning{
-
-stroke:#FFD54A;
-
-stroke-width:5;
-
-}
-
-.skeleton-danger{
-
-stroke:#FF5555;
-
-stroke-width:5;
-
-}
-
-/* ===========================================
-   ANALYSIS MESSAGE
-=========================================== */
-
-.analysis-message{
-
-position:absolute;
-
-left:50%;
-
-bottom:35px;
-
-transform:translateX(-50%);
-
-padding:12px 22px;
-
-border-radius:18px;
-
-background:rgba(0,0,0,.5);
-
-backdrop-filter:blur(10px);
-
-color:white;
-
-font-size:15px;
-
-font-weight:700;
-
-z-index:55;
-
-}
-
-/* ===========================================
-   NATIONAL OVERLAY
-=========================================== */
-
-.national-overlay{
-
-position:absolute;
-
-inset:0;
-
-pointer-events:none;
-
-background:
-
-radial-gradient(
-
-circle at center,
-
-transparent 60%,
-
-rgba(0,183,255,.08)
-
-);
-
-}
-/* ===========================================
-   TOAST
-=========================================== */
-
-#toast{
-
-position:fixed;
-
-right:30px;
-
-bottom:30px;
-
-padding:16px 24px;
-
-background:
-
-linear-gradient(
-135deg,
-#00B7FF,
-#0078FF
-);
-
-color:white;
-
-font-weight:700;
-
-border-radius:16px;
-
-box-shadow:
-
-0 15px 35px rgba(0,0,0,.3);
-
-opacity:0;
-
-transform:translateY(40px);
-
-transition:.35s;
-
-z-index:9999;
-
-}
-
-#toast.show{
-
-opacity:1;
-
-transform:translateY(0);
-
-}
-
-#toast.success{
-
-background:
-
-linear-gradient(
-135deg,
-#29D17C,
-#00A65A
-);
-
-}
-
-#toast.error{
-
-background:
-
-linear-gradient(
-135deg,
-#FF5A5A,
-#C62828
-);
-
-}
-
-/* ===========================================
-   LOADING
-=========================================== */
-
-#loadingScreen{
-
-position:fixed;
-
-inset:0;
-
-background:
-
-linear-gradient(
-135deg,
-#07131f,
-#0b2237
-);
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-z-index:99999;
-
-transition:.4s;
-
-}
-
-#loadingScreen.hide{
-
-opacity:0;
-
-visibility:hidden;
-
-}
-
-.loader{
-
-text-align:center;
-
-}
-
-.spinner{
-
-width:80px;
-
-height:80px;
-
-margin:auto;
-
-border-radius:50%;
-
-border:6px solid rgba(255,255,255,.12);
-
-border-top-color:#00E5FF;
-
-animation:spin 1s linear infinite;
-
-}
-
-@keyframes spin{
-
-to{
-
-transform:rotate(360deg);
-
-}
-
-}
-
-.loader h2{
-
-margin-top:30px;
-
-font-size:28px;
-
-}
-
-.loader p{
-
-margin-top:12px;
-
-color:#9fb4c8;
-
-}
-
-/* ===========================================
-   MODAL
-=========================================== */
-
-.modal{
-
-position:fixed;
-
-inset:0;
-
-display:none;
-
-justify-content:center;
-
-align-items:center;
-
-background:rgba(0,0,0,.55);
-
-backdrop-filter:blur(6px);
-
-z-index:9999;
-
-}
-
-.modal.show{
-
-display:flex;
-
-}
-
-.modal-box{
-
-width:420px;
-
-max-width:90%;
-
-padding:30px;
-
-border-radius:24px;
-
-background:
-
-linear-gradient(
-180deg,
-#122538,
-#17304a
-);
-
-box-shadow:
-
-0 25px 60px rgba(0,0,0,.45);
-
 }
-
-.modal-box h2{
-
-margin-bottom:15px;
-
-}
-
-.modal-box p{
-
-line-height:1.7;
-
-margin-bottom:25px;
-
-color:#d8e4ef;
-
-}
-
-/* ===========================================
-   FOOTER
-=========================================== */
-
-footer{
-
-margin-top:50px;
-
-padding:25px;
-
-text-align:center;
-
-color:#8ea8c0;
-
-font-size:14px;
 
-border-top:
+button:active{
 
-1px solid rgba(255,255,255,.08);
+    transform:scale(.97);
 
 }
 
-/* ===========================================
-   SCROLLBAR
-=========================================== */
+/* ===================================== */
+/* Scrollbar */
+/* ===================================== */
 
 ::-webkit-scrollbar{
 
-width:10px;
-
-height:10px;
+    width:10px;
 
 }
 
 ::-webkit-scrollbar-track{
 
-background:#09131e;
+    background:#111827;
 
 }
 
 ::-webkit-scrollbar-thumb{
 
-background:#1d5f94;
+    background:#334155;
 
-border-radius:30px;
+    border-radius:10px;
 
 }
 
 ::-webkit-scrollbar-thumb:hover{
 
-background:#2a84d2;
+    background:#475569;
 
 }
 
-/* ===========================================
-   PRINT
-=========================================== */
+/* ===================================== */
+/* Footer */
+/* ===================================== */
 
-@media print{
-
-.topbar,
-.sidebar,
-.button-group,
 footer{
 
-display:none !important;
+    margin-top:40px;
+
+    padding:20px;
+
+    text-align:center;
+
+    color:#94a3b8;
+
+    border-top:1px solid #334155;
 
 }
 
-.content{
+/* ===================================== */
+/* Responsive */
+/* ===================================== */
 
-margin:0;
+@media(max-width:1200px){
 
-padding:0;
+    .dashboard-panel{
 
-}
+        grid-template-columns:
 
-.card{
+        repeat(2,1fr);
 
-box-shadow:none;
+    }
 
-border:1px solid #ddd;
+    .analysis-panel{
 
-background:white;
+        grid-template-columns:
 
-color:black;
+        1fr;
 
-}
+    }
 
-body{
+    .summary-panel{
 
-background:white;
+        grid-template-columns:
 
-color:black;
+        1fr;
 
-}
-
-}
-
-/* ===========================================
-   MOBILE
-=========================================== */
-
-@media(max-width:900px){
-
-.sidebar{
-
-width:80px;
+    }
 
 }
 
-.sidebar .menu{
+@media(max-width:768px){
 
-justify-content:center;
+    .dashboard-panel{
 
-font-size:0;
+        grid-template-columns:
 
-}
+        1fr;
 
-.sidebar .menu::before{
+    }
 
-font-size:22px;
+    .sports-grid{
 
-}
+        grid-template-columns:
 
-.content{
+        repeat(2,1fr);
 
-margin-left:80px;
+    }
 
-padding:20px;
+    .camera-panel{
 
-}
+        height:380px;
 
-}
-
-@media(max-width:600px){
-
-.topbar{
-
-padding:0 15px;
+    }
 
 }
-
-.logo{
-
-font-size:20px;
-
-}
-
-.clock{
-
-font-size:14px;
-
-padding:8px 12px;
-
-}
-
-.content{
-
-padding:15px;
-
-}
-
-.card{
-
-padding:18px;
-
-}
-
-.big-number{
-
-font-size:36px;
-
-}
-
-}
-
-/* ===========================================
-   END
-=========================================== */
