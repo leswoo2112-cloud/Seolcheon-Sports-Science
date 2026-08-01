@@ -1,873 +1,323 @@
-/*
-=========================================
-analysis.js
-설천고 스포츠과학센터 PRO
-AI Analysis Engine
-Version 1.0
-=========================================
-*/
+/* ==========================================
+   Analysis Engine
+========================================== */
 
 "use strict";
 
-class AnalysisEngine{
+const Analysis = {
 
-    constructor(){
+    pose: null,
 
-        this.score=0;
+    initialized: false,
 
-        this.grade="-";
+    landmarks: [],
 
-        this.feedback=[];
+    score: 0,
 
-        this.risk="안전";
+    balance: 0,
 
-        this.nationalScore=92;
+    posture: 0,
 
-        this.exercise="squat";
+    stability: 0,
 
-        this.result={};
+    sport: "바이애슬론"
 
-    }
+};
 
-    /* =============================== */
+/* ==========================================
+   Initialize
+========================================== */
 
-    analyze(data){
+async function initializeAnalysis(){
 
-        this.data=data;
+    Analysis.pose = new Pose({
 
-        this.calculateScore();
+        locateFile:(file)=>{
 
-        this.calculateGrade();
-
-        this.calculateRisk();
-
-        this.generateFeedback();
-
-        this.compareNational();
-
-        return this.result;
-
-    }
-
-    /* =============================== */
-
-    calculateScore(){
-
-        let score=100;
-
-        if(this.data.knee<85){
-
-            score-=8;
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
 
         }
 
-        if(this.data.knee>170){
+    });
 
-            score-=10;
+    Analysis.pose.setOptions({
 
-        }
+        modelComplexity:2,
 
-        if(this.data.hip<75){
+        smoothLandmarks:true,
 
-            score-=10;
+        enableSegmentation:false,
 
-        }
+        smoothSegmentation:true,
 
-        if(this.data.balance<90){
+        minDetectionConfidence:0.6,
 
-            score-=8;
+        minTrackingConfidence:0.6
 
-        }
+    });
 
-        if(this.data.valgus){
+    Analysis.pose.onResults(onPoseResults);
 
-            score-=15;
+    Analysis.initialized=true;
 
-        }
-
-        this.score=Math.max(0,score);
-
-    }
-
-    /* =============================== */
-
-    calculateGrade(){
-
-        if(this.score>=98){
-
-            this.grade="S+";
-
-        }
-
-        else if(this.score>=95){
-
-            this.grade="S";
-
-        }
-
-        else if(this.score>=90){
-
-            this.grade="A+";
-
-        }
-
-        else if(this.score>=85){
-
-            this.grade="A";
-
-        }
-
-        else if(this.score>=80){
-
-            this.grade="B+";
-
-        }
-
-        else if(this.score>=75){
-
-            this.grade="B";
-
-        }
-
-        else{
-
-            this.grade="C";
-
-        }
-
-    }
-
-    /* =============================== */
-
-    calculateRisk(){
-
-        if(this.data.valgus){
-
-            this.risk="높음";
-
-            return;
-
-        }
-
-        if(this.data.balance<85){
-
-            this.risk="주의";
-
-            return;
-
-        }
-
-        this.risk="안전";
-
-    }
+    console.log("🤖 Analysis Ready");
 
 }
-    /* =============================== */
-    /* National Compare */
-    /* =============================== */
 
-    compareNational(){
+/* ==========================================
+   Receive Frame
+========================================== */
 
-        this.result.national={
+async function analyzeFrame(video){
 
-            score:
+    if(!Analysis.initialized){
 
-            this.score-
-
-            this.nationalScore,
-
-            percent:
-
-            Math.round(
-
-                this.score/
-
-                this.nationalScore*100
-
-            )
-
-        };
+        return;
 
     }
 
-    /* =============================== */
-    /* Feedback */
-    /* =============================== */
+    await Analysis.pose.send({
 
-    generateFeedback(){
+        image:video
 
-        this.feedback=[];
+    });
 
-        if(this.data.knee>170){
+}
 
-            this.feedback.push({
+/* ==========================================
+   Pose Result
+========================================== */
 
-                title:"깊이 부족",
+function onPoseResults(results){
 
-                message:
+    if(!results.poseLandmarks){
 
-                "조금 더 깊게 앉으세요.",
-
-                level:"warning"
-
-            });
-
-        }
-
-        if(this.data.knee<75){
-
-            this.feedback.push({
-
-                title:"과도한 깊이",
-
-                message:
-
-                "조금 올라오세요.",
-
-                level:"warning"
-
-            });
-
-        }
-
-        if(this.data.hip<75){
-
-            this.feedback.push({
-
-                title:"허리",
-
-                message:
-
-                "상체를 조금 세우세요.",
-
-                level:"danger"
-
-            });
-
-        }
-
-        if(this.data.balance<90){
-
-            this.feedback.push({
-
-                title:"밸런스",
-
-                message:
-
-                "좌우 체중을 맞춰주세요.",
-
-                level:"info"
-
-            });
-
-        }
-
-        if(this.data.valgus){
-
-            this.feedback.push({
-
-                title:"무릎",
-
-                message:
-
-                "무릎이 안쪽으로 들어갑니다.",
-
-                level:"danger"
-
-            });
-
-        }
-
-        if(this.feedback.length===0){
-
-            this.feedback.push({
-
-                title:"Excellent",
-
-                message:
-
-                "국가대표 수준입니다.",
-
-                level:"success"
-
-            });
-
-        }
+        return;
 
     }
 
-    /* =============================== */
-    /* Exercise Standard */
-    /* =============================== */
+    Analysis.landmarks=
 
-    getExerciseStandard(){
+        results.poseLandmarks;
 
-        const standards={
+    drawSkeleton(results);
 
-            squat:{
+    calculateAnalysis();
 
-                knee:140,
+}
+/* ==========================================
+   Draw Skeleton
+========================================== */
 
-                hip:120,
+function drawSkeleton(results){
 
-                balance:95
+    const canvas=$("#poseCanvas");
 
-            },
+    if(!canvas) return;
 
-            lunge:{
+    const ctx=canvas.getContext("2d");
 
-                knee:100,
+    canvas.width=canvas.clientWidth;
+    canvas.height=canvas.clientHeight;
 
-                hip:115,
+    ctx.clearRect(
 
-                balance:94
+        0,
+        0,
+        canvas.width,
+        canvas.height
 
-            },
+    );
 
-            pushup:{
+    drawConnectors(
 
-                elbow:90,
+        ctx,
 
-                balance:95
+        results.poseLandmarks,
 
-            },
+        POSE_CONNECTIONS,
 
-            plank:{
+        {
 
-                hip:180,
+            color:"#4F8CFF",
 
-                balance:98
-
-            }
-
-        };
-
-        return standards[
-
-            this.exercise
-
-        ];
-
-    }
-
-    /* =============================== */
-    /* Result */
-    /* =============================== */
-
-    buildResult(){
-
-        this.result.score=
-
-        this.score;
-
-        this.result.grade=
-
-        this.grade;
-
-        this.result.risk=
-
-        this.risk;
-
-        this.result.feedback=
-
-        this.feedback;
-
-        this.result.exercise=
-
-        this.exercise;
-
-        this.result.timestamp=
-
-        new Date();
-
-    }
-        /* =============================== */
-    /* Detail Score */
-    /* =============================== */
-
-    calculateDetailScore(){
-
-        this.detail={
-
-            depth:20,
-
-            balance:20,
-
-            posture:20,
-
-            stability:20,
-
-            movement:20
-
-        };
-
-        if(this.data.knee>170){
-
-            this.detail.depth-=5;
+            lineWidth:4
 
         }
 
-        if(this.data.knee<80){
+    );
 
-            this.detail.depth-=5;
+    drawLandmarks(
 
-        }
+        ctx,
 
-        if(this.data.balance<90){
+        results.poseLandmarks,
 
-            this.detail.balance-=6;
+        {
 
-        }
+            color:"#22C55E",
 
-        if(this.data.valgus){
+            fillColor:"#FFFFFF",
 
-            this.detail.stability-=10;
-
-        }
-
-        if(this.data.hip<75){
-
-            this.detail.posture-=8;
+            radius:5
 
         }
 
-        this.result.detail=this.detail;
+    );
 
-    }
+}
 
-    /* =============================== */
-    /* National Percent */
-    /* =============================== */
+/* ==========================================
+   Landmark Shortcut
+========================================== */
 
-    calculateNationalPercent(){
+function lm(index){
 
-        this.result.percent=
+    return Analysis.landmarks[index];
 
-        Math.min(
+}
 
-            100,
+/* ==========================================
+   Calculate Angle
+========================================== */
 
-            Math.round(
+function calculateAngle(a,b,c){
 
-                this.score/
+    const ab={
 
-                this.nationalScore*
+        x:a.x-b.x,
 
-                100
+        y:a.y-b.y
 
-            )
+    };
+
+    const cb={
+
+        x:c.x-b.x,
+
+        y:c.y-b.y
+
+    };
+
+    const dot=
+
+        ab.x*cb.x+
+
+        ab.y*cb.y;
+
+    const mag1=Math.sqrt(
+
+        ab.x**2+
+
+        ab.y**2
+
+    );
+
+    const mag2=Math.sqrt(
+
+        cb.x**2+
+
+        cb.y**2
+
+    );
+
+    let angle=Math.acos(
+
+        dot/(mag1*mag2)
+
+    );
+
+    angle=
+
+        angle*180/Math.PI;
+
+    return Math.round(angle);
+
+}
+
+/* ==========================================
+   Joint Angles
+========================================== */
+
+function calculateJointAngles(){
+
+    Analysis.leftKnee=
+
+        calculateAngle(
+
+            lm(23),
+
+            lm(25),
+
+            lm(27)
 
         );
 
-    }
+    Analysis.rightKnee=
 
-    /* =============================== */
-    /* Star Rating */
-    /* =============================== */
+        calculateAngle(
 
-    calculateStar(){
+            lm(24),
 
-        let star=1;
+            lm(26),
 
-        if(this.score>=60) star=2;
-
-        if(this.score>=70) star=3;
-
-        if(this.score>=80) star=4;
-
-        if(this.score>=90) star=5;
-
-        this.result.star=
-
-        "★".repeat(star)+
-
-        "☆".repeat(5-star);
-
-    }
-
-    /* =============================== */
-    /* Difficulty */
-    /* =============================== */
-
-    calculateDifficulty(){
-
-        const difficulty={
-
-            squat:"상",
-
-            lunge:"중",
-
-            pushup:"중",
-
-            plank:"하"
-
-        };
-
-        this.result.difficulty=
-
-        difficulty[this.exercise]
-
-        ||"중";
-
-    }
-
-    /* =============================== */
-    /* Injury Risk */
-    /* =============================== */
-
-    calculateJointRisk(){
-
-        this.result.jointRisk={
-
-            knee:"안전",
-
-            hip:"안전",
-
-            ankle:"안전",
-
-            back:"안전"
-
-        };
-
-        if(this.data.valgus){
-
-            this.result.jointRisk.knee=
-
-            "높음";
-
-        }
-
-        if(this.data.balance<90){
-
-            this.result.jointRisk.ankle=
-
-            "주의";
-
-        }
-
-        if(this.data.hip<75){
-
-            this.result.jointRisk.back=
-
-            "주의";
-
-        }
-
-    }
-
-    /* =============================== */
-    /* Summary */
-    /* =============================== */
-
-    generateSummary(){
-
-        this.result.summary=
-
-        `${this.grade} 등급 · 국가대표 대비 ${this.result.percent}%`;
-
-    }
-
-    /* =============================== */
-    /* Update Result */
-    /* =============================== */
-
-    finalize(){
-
-        this.calculateDetailScore();
-
-        this.calculateNationalPercent();
-
-        this.calculateStar();
-
-        this.calculateDifficulty();
-
-        this.calculateJointRisk();
-
-        this.generateSummary();
-
-        return this.result;
-
-    }
-
-}
-    /* =============================== */
-    /* Biathlon Analysis */
-    /* =============================== */
-
-    analyzeBiathlon(){
-
-        this.result.biathlon={
-
-            ski:100,
-
-            shooting:100,
-
-            transition:100,
-
-            overall:100
-
-        };
-
-        if(this.data.balance<90){
-
-            this.result.biathlon.ski-=8;
-
-        }
-
-        if(this.data.valgus){
-
-            this.result.biathlon.ski-=12;
-
-        }
-
-        if(this.data.hip<75){
-
-            this.result.biathlon.transition-=10;
-
-        }
-
-        this.result.biathlon.overall=
-
-        Math.round(
-
-            (
-
-                this.result.biathlon.ski+
-
-                this.result.biathlon.shooting+
-
-                this.result.biathlon.transition
-
-            )/3
+            lm(28)
 
         );
 
-    }
+    Analysis.leftElbow=
 
-    /* =============================== */
-    /* Roller Ski */
-    /* =============================== */
+        calculateAngle(
 
-    analyzeRollerSki(){
+            lm(11),
 
-        this.result.roller={
+            lm(13),
 
-            balance:this.data.balance,
+            lm(15)
 
-            knee:this.data.knee,
+        );
 
-            hip:this.data.hip,
+    Analysis.rightElbow=
 
-            score:0
+        calculateAngle(
 
-        };
+            lm(12),
 
-        let score=100;
+            lm(14),
 
-        if(this.data.balance<92){
+            lm(16)
 
-            score-=8;
+        );
 
-        }
+}
 
-        if(this.data.knee<130){
+/* ==========================================
+   Balance
+========================================== */
 
-            score-=6;
+function calculateBalance(){
 
-        }
+    const shoulder=
 
-        if(this.data.hip<105){
+        Math.abs(
 
-            score-=8;
+            lm(11).y-
 
-        }
+            lm(12).y
 
-        this.result.roller.score=score;
+        );
 
-    }
+    const hip=
 
-    /* =============================== */
-    /* Running */
-    /* =============================== */
+        Math.abs(
 
-    analyzeRunning(){
+            lm(23).y-
 
-        this.result.running={
+            lm(24).y
 
-            posture:100,
+        );
 
-            stability:100,
-
-            efficiency:100
-
-        };
-
-        if(this.data.balance<90){
-
-            this.result.running.stability-=10;
-
-        }
-
-        if(this.data.valgus){
-
-            this.result.running.efficiency-=12;
-
-        }
-
-    }
-
-    /* =============================== */
-    /* Shooting */
-    /* =============================== */
-
-    analyzeShooting(){
-
-        this.result.shooting={
-
-            bodyStability:100,
-
-            shoulder:100,
-
-            balance:100
-
-        };
-
-        if(this.data.balance<95){
-
-            this.result.shooting.balance-=12;
-
-        }
-
-        if(this.data.hip<80){
-
-            this.result.shooting.bodyStability-=10;
-
-        }
-
-    }
-
-    /* =============================== */
-    /* College Test */
-    /* =============================== */
-
-    analyzeCollege(){
-
-        this.result.college={
-
-            squat:this.score,
-
-            jump:0,
-
-            sprint:0,
-
-            situp:0,
-
-            pushup:0
-
-        };
-
-    }
-
-    /* =============================== */
-    /* AI Recommendation */
-    /* =============================== */
-
-    generateRecommendation(){
-
-        this.result.recommend=[];
-
-        if(this.data.balance<90){
-
-            this.result.recommend.push(
-
-                "싱글 레그 스쿼트"
-
-            );
-
-        }
-
-        if(this.data.valgus){
-
-            this.result.recommend.push(
-
-                "힙 어브덕션"
-
-            );
-
-        }
-
-        if(this.data.hip<75){
-
-            this.result.recommend.push(
-
-                "코어 안정화"
-
-            );
-
-        }
-
-        if(this.result.recommend.length===0){
-
-            this.result.recommend.push(
-
-                "현재 프로그램 유지"
-
-            );
-
-        }
-
-    }
-
-    /* =============================== */
-    /* Full Analysis */
-    /* =============================== */
-
-    analyzeAll(){
-
-        this.analyzeBiathlon();
-
-        this.analyzeRollerSki();
-
-        this.analyzeRunning();
-
-        this.analyzeShooting();
-
-        this.analyzeCollege();
-
-        this.generateRecommendation();
-
-        return this.result;
-
-    }
-        /* =============================== */
-    /* Symmetry Analysis */
-    /* =============================== */
-
-    analyzeSymmetry(){
-
-        const leftKnee =
-        this.data.leftKnee ?? this.data.knee;
-
-        const rightKnee =
-        this.data.rightKnee ?? this.data.knee;
-
-        const leftHip =
-        this.data.leftHip ?? this.data.hip;
-
-        const rightHip =
-        this.data.rightHip ?? this.data.hip;
-
-        this.result.symmetry = {
-
-            knee:
-            Math.abs(leftKnee-rightKnee),
-
-            hip:
-            Math.abs(leftHip-rightHip)
-
-        };
-
-        this.result.symmetry.score =
+    Analysis.balance=
 
         Math.max(
 
@@ -875,258 +325,418 @@ class AnalysisEngine{
 
             100-
 
-            (
+            Math.round(
 
-                this.result.symmetry.knee+
-
-                this.result.symmetry.hip
+                (shoulder+hip)*200
 
             )
 
         );
 
-    }
+}
+/* ==========================================
+   AI Analysis
+========================================== */
 
-    /* =============================== */
-    /* Power Estimate */
-    /* =============================== */
+function calculateAnalysis(){
 
-    estimatePower(){
+    calculateJointAngles();
 
-        let power=100;
+    calculateBalance();
 
-        power+=
+    calculatePosture();
 
-        (this.data.knee-130)*0.4;
+    calculateStability();
 
-        power+=
+    calculateScore();
 
-        (this.data.balance-90)*0.6;
+    updateAnalysisUI();
 
-        power=
+}
+
+/* ==========================================
+   Posture
+========================================== */
+
+function calculatePosture(){
+
+    const shoulderTilt=
+
+        Math.abs(
+
+            lm(11).y-
+
+            lm(12).y
+
+        );
+
+    const hipTilt=
+
+        Math.abs(
+
+            lm(23).y-
+
+            lm(24).y
+
+        );
+
+    const bodyTilt=
+
+        shoulderTilt+hipTilt;
+
+    Analysis.posture=
 
         Math.max(
 
             0,
 
-            Math.min(
+            100-
 
-                100,
+            Math.round(bodyTilt*180)
 
-                Math.round(power)
+        );
+
+}
+
+/* ==========================================
+   Stability
+========================================== */
+
+function calculateStability(){
+
+    const kneeGap=
+
+        Math.abs(
+
+            Analysis.leftKnee-
+
+            Analysis.rightKnee
+
+        );
+
+    const elbowGap=
+
+        Math.abs(
+
+            Analysis.leftElbow-
+
+            Analysis.rightElbow
+
+        );
+
+    Analysis.stability=
+
+        Math.max(
+
+            0,
+
+            100-
+
+            Math.round(
+
+                (kneeGap+elbowGap)/2
 
             )
 
         );
 
-        this.result.power=power;
+}
 
-    }
+/* ==========================================
+   AI Score
+========================================== */
 
-    /* =============================== */
-    /* Stability */
-    /* =============================== */
+function calculateScore(){
 
-    calculateStability(){
+    Analysis.score=Math.round(
 
-        let value=100;
+        Analysis.balance*0.35+
 
-        if(this.data.valgus){
+        Analysis.posture*0.35+
 
-            value-=15;
+        Analysis.stability*0.30
 
-        }
+    );
 
-        if(this.data.balance<90){
+}
 
-            value-=10;
+/* ==========================================
+   Update UI
+========================================== */
 
-        }
+function updateAnalysisUI(){
 
-        if(this.data.hip<80){
+    $("#aiScore").textContent=
 
-            value-=8;
+        Analysis.score;
 
-        }
+    $("#balanceScore").textContent=
 
-        this.result.stability=value;
+        Analysis.balance+"%";
 
-    }
+    $("#nationalCompare").textContent=
 
-    /* =============================== */
-    /* Mobility */
-    /* =============================== */
+        Math.min(
 
-    calculateMobility(){
+            100,
 
-        this.result.mobility={
+            Analysis.score
 
-            hip:
+        )+"%";
 
-            Math.min(
+    $("#injuryRisk").textContent=
 
-                100,
+        getRisk();
 
-                this.data.hip
+}
 
-            ),
+/* ==========================================
+   Injury Risk
+========================================== */
 
-            knee:
+function getRisk(){
 
-            Math.min(
+    if(Analysis.score>=90)
 
-                100,
+        return "매우 안전";
 
-                this.data.knee
+    if(Analysis.score>=80)
 
-            )
+        return "안전";
 
-        };
+    if(Analysis.score>=70)
 
-    }
+        return "주의";
 
-    /* =============================== */
-    /* Performance Index */
-    /* =============================== */
+    if(Analysis.score>=60)
 
-    calculatePerformanceIndex(){
+        return "위험";
 
-        this.result.performance=
+    return "매우 위험";
 
-        Math.round(
+}
 
-            (
+/* ==========================================
+   Save Result
+========================================== */
 
-                this.score+
+function saveAnalysisResult(){
 
-                this.result.power+
+    App.analysis.push({
 
-                this.result.stability+
+        date:new Date().toLocaleString(),
 
-                this.result.symmetry.score
+        sport:Analysis.sport,
 
-            )/4
+        score:Analysis.score,
+
+        balance:Analysis.balance,
+
+        posture:Analysis.posture,
+
+        stability:Analysis.stability
+
+    });
+
+    saveStorage();
+
+    refreshApp();
+
+}
+/* ==========================================
+   National Compare
+========================================== */
+
+const NationalStandard = {
+
+    default:95,
+
+    biathlon:96,
+
+    athletics:95,
+
+    basketball:94,
+
+    soccer:94,
+
+    volleyball:94,
+
+    baseball:94,
+
+    golf:95,
+
+    taekwondo:96,
+
+    swimming:95,
+
+    college:90
+
+};
+
+function compareNational(){
+
+    const target=
+
+        NationalStandard[Analysis.sport.toLowerCase()] ??
+
+        NationalStandard.default;
+
+    const percent=Math.round(
+
+        (Analysis.score/target)*100
+
+    );
+
+    $("#nationalCompare").textContent=
+
+        Math.min(percent,100)+"%";
+
+    return percent;
+
+}
+
+/* ==========================================
+   AI Coach
+========================================== */
+
+function generateCoachComment(){
+
+    let comments=[];
+
+    if(Analysis.balance<85){
+
+        comments.push(
+
+            "⚖ 좌우 균형을 개선하세요."
 
         );
 
     }
 
-    /* =============================== */
-    /* Weekly Trend */
-    /* =============================== */
+    if(Analysis.posture<85){
 
-    calculateTrend(history=[]){
+        comments.push(
 
-        if(history.length<2){
+            "🦴 상체 자세가 무너집니다."
 
-            this.result.trend=0;
-
-            return;
-
-        }
-
-        const first=
-
-        history[0].score;
-
-        const last=
-
-        history[history.length-1].score;
-
-        this.result.trend=
-
-        Math.round(last-first);
+        );
 
     }
 
-    /* =============================== */
-    /* Training Plan */
-    /* =============================== */
+    if(Analysis.stability<85){
 
-    generateTrainingPlan(){
+        comments.push(
 
-        this.result.plan=[];
+            "🦵 하체 안정성이 부족합니다."
 
-        if(this.result.symmetry.score<90){
-
-            this.result.plan.push({
-
-                title:"좌우 밸런스",
-
-                exercise:
-
-                "싱글레그 스쿼트"
-
-            });
-
-        }
-
-        if(this.result.power<85){
-
-            this.result.plan.push({
-
-                title:"폭발력",
-
-                exercise:
-
-                "박스 점프"
-
-            });
-
-        }
-
-        if(this.result.stability<90){
-
-            this.result.plan.push({
-
-                title:"코어",
-
-                exercise:
-
-                "플랭크"
-
-            });
-
-        }
-
-        if(this.result.plan.length===0){
-
-            this.result.plan.push({
-
-                title:"유지",
-
-                exercise:
-
-                "현재 프로그램 유지"
-
-            });
-
-        }
+        );
 
     }
 
-    /* =============================== */
-    /* Final */
-    /* =============================== */
+    if(Analysis.leftKnee<150){
 
-    finalizeAnalysis(history=[]){
+        comments.push(
 
-        this.analyzeSymmetry();
+            "📐 왼쪽 무릎 각도를 조금 더 펴세요."
 
-        this.estimatePower();
-
-        this.calculateStability();
-
-        this.calculateMobility();
-
-        this.calculatePerformanceIndex();
-
-        this.calculateTrend(history);
-
-        this.generateTrainingPlan();
-
-        return this.result;
+        );
 
     }
+
+    if(Analysis.rightKnee<150){
+
+        comments.push(
+
+            "📐 오른쪽 무릎 각도를 조금 더 펴세요."
+
+        );
+
+    }
+
+    if(comments.length===0){
+
+        comments.push(
+
+            "🏆 국가대표 수준의 자세입니다."
+
+        );
+
+    }
+
+    $("#reportFeedback").innerHTML=
+
+        comments.join("<br>");
+
+}
+
+/* ==========================================
+   Sport Analysis
+========================================== */
+
+function analyzeSport(){
+
+    switch(Analysis.sport){
+
+        case "바이애슬론":
+
+            analyzeBiathlon();
+
+            break;
+
+        case "육상":
+
+            analyzeAthletics();
+
+            break;
+
+        case "농구":
+
+            analyzeBasketball();
+
+            break;
+
+        case "축구":
+
+            analyzeSoccer();
+
+            break;
+
+        case "체대입시":
+
+            analyzeCollege();
+
+            break;
+
+        default:
+
+            break;
+
+    }
+
+}
+
+/* ==========================================
+   Placeholder
+========================================== */
+
+function analyzeBiathlon(){}
+
+function analyzeAthletics(){}
+
+function analyzeBasketball(){}
+
+function analyzeSoccer(){}
+
+function analyzeCollege(){}
+
+/* ==========================================
+   Refresh
+========================================== */
+
+function refreshAnalysis(){
+
+    compareNational();
+
+    generateCoachComment();
 
 }
