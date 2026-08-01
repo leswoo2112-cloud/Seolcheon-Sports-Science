@@ -5147,6 +5147,8 @@ function stopLiveCamera(
     const stopButton =
         $("stopLiveCameraButton");
 
+const switchButton =
+    $("switchCameraButton");
     const captureButton =
         $("captureLiveButton");
 
@@ -5160,6 +5162,9 @@ function stopLiveCamera(
     if (stopButton) {
         stopButton.disabled = true;
     }
+    if (switchButton) {
+    switchButton.disabled = true;
+
 
     if (captureButton) {
         captureButton.disabled = true;
