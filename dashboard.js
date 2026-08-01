@@ -1,508 +1,668 @@
-/*
-=========================================
-dashboard.js
-설천고 스포츠과학센터 PRO
-Dashboard Engine
-Version 1.0
-=========================================
-*/
+/* ==========================================
+   Dashboard Module
+========================================== */
 
 "use strict";
 
-export class Dashboard{
+const Dashboard={
 
-    constructor(firebase){
+    todayAnalysis:0,
 
-        this.firebase=firebase;
+    bestScore:0,
 
-        this.stats={
+    averageScore:0,
 
-            athletes:0,
+    athleteCount:0
 
-            trainings:0,
+};
 
-            reports:0,
+/* ==========================================
+   Refresh
+========================================== */
 
-            averageScore:0,
+function refreshDashboard(){
 
-            nationalPercent:0
+    calculateDashboard();
 
-        };
+    updateDashboardCards();
 
-    }
+    updateDashboardChart();
 
-    /* ============================== */
+    updateRecentAnalysis();
 
-    async initialize(){
-
-        await this.loadStatistics();
-
-        this.renderCards();
-
-        this.renderClock();
-
-    }
-
-    /* ============================== */
-
-    async loadStatistics(){
-
-        const info=
-
-        await this.firebase.getDashboardInfo();
-
-        this.stats.athletes=
-
-        info.athleteCount;
-
-        this.stats.trainings=
-
-        info.trainingCount;
-
-        this.stats.reports=
-
-        info.reportCount;
-
-    }
-
-    /* ============================== */
-
-    renderCards(){
-
-        document.getElementById(
-
-            "dashboardAthletes"
-
-        ).textContent=
-
-        this.stats.athletes;
-
-        document.getElementById(
-
-            "dashboardTraining"
-
-        ).textContent=
-
-        this.stats.trainings;
-
-        document.getElementById(
-
-            "dashboardReports"
-
-        ).textContent=
-
-        this.stats.reports;
-
-    }
-
-    /* ============================== */
-
-    renderClock(){
-
-        const update=()=>{
-
-            const now=new Date();
-
-            document.getElementById(
-
-                "dashboardClock"
-
-            ).textContent=
-
-            now.toLocaleTimeString("ko-KR");
-
-        };
-
-        update();
-
-        setInterval(update,1000);
-
-    }
-
-    /* ============================== */
-
-    setAverageScore(score){
-
-        this.stats.averageScore=score;
-
-        document.getElementById(
-
-            "averageScore"
-
-        ).textContent=
-
-        score.toFixed(1);
-
-    }
-
-    /* ============================== */
-
-    setNationalPercent(percent){
-
-        this.stats.nationalPercent=percent;
-
-        document.getElementById(
-
-            "nationalPercent"
-
-        ).textContent=
-
-        percent+"%";
-
-    }
+    updateTodayCoach();
 
 }
-    /* ============================== */
-    /* Recent Analysis */
-    /* ============================== */
 
-    async loadRecentAnalysis(){
+/* ==========================================
+   Calculate
+========================================== */
 
-        const reports =
+function calculateDashboard(){
 
-        await this.firebase.loadReports();
+    Dashboard.athleteCount=
 
-        this.recentReports =
+        App.athletes.length;
 
-        reports
-        .sort((a,b)=>
+    Dashboard.todayAnalysis=
 
-            new Date(b.createdAt)-
+        App.analysis.length;
 
-            new Date(a.createdAt)
+    if(App.analysis.length===0){
 
-        )
-        .slice(0,5);
+        Dashboard.averageScore=0;
 
-        this.renderRecent();
+        Dashboard.bestScore=0;
+
+        return;
 
     }
 
-    /* ============================== */
+    Dashboard.bestScore=
 
-    renderRecent(){
+        Math.max(
 
-        const list =
+            ...App.analysis.map(
 
-        document.getElementById(
+                item=>item.score
 
-            "recentAnalysis"
+            )
 
         );
 
-        if(!list) return;
+    Dashboard.averageScore=
 
-        list.innerHTML="";
+        Math.round(
 
-        this.recentReports.forEach(item=>{
+            App.analysis.reduce(
 
-            const row=
+                (sum,item)=>
 
-            document.createElement("div");
+                sum+item.score,
 
-            row.className=
+                0
 
-            "recent-item";
+            )/
 
-            row.innerHTML=`
+            App.analysis.length
 
-                <div>${item.name??"선수"}</div>
-
-                <div>${item.score}점</div>
-
-                <div>${item.grade}</div>
-
-            `;
-
-            list.appendChild(row);
-
-        });
-
-    }
-
-    /* ============================== */
-    /* Today's Training */
-    /* ============================== */
-
-    async loadTodayTraining(){
-
-        const training=
-
-        await this.firebase.loadTraining();
-
-        const today=
-
-        new Date()
-
-        .toLocaleDateString();
-
-        this.todayTraining=
-
-        training.filter(item=>{
-
-            if(!item.createdAt) return false;
-
-            const date=
-
-            item.createdAt
-
-            .toDate()
-
-            .toLocaleDateString();
-
-            return date===today;
-
-        });
-
-        document.getElementById(
-
-            "todayTraining"
-
-        ).textContent=
-
-        this.todayTraining.length;
-
-    }
-
-    /* ============================== */
-    /* Average Score */
-    /* ============================== */
-
-    async calculateAverage(){
-
-        const reports=
-
-        await this.firebase.loadReports();
-
-        if(reports.length===0){
-
-            return;
-
-        }
-
-        const avg=
-
-        reports.reduce(
-
-            (sum,item)=>
-
-            sum+(item.score||0),
-
-            0
-
-        )/reports.length;
-
-        this.setAverageScore(avg);
-
-    }
-
-    /* ============================== */
-    /* Dashboard Refresh */
-    /* ============================== */
-
-    async refresh(){
-
-        await this.loadStatistics();
-
-        await this.loadRecentAnalysis();
-
-        await this.loadTodayTraining();
-
-        await this.calculateAverage();
-
-        this.renderCards();
-
-    }
-
-    /* ============================== */
-    /* Auto Refresh */
-    /* ============================== */
-
-    startAutoRefresh(){
-
-        this.refresh();
-
-        setInterval(()=>{
-
-            this.refresh();
-
-        },30000);
-
-    }
+        );
 
 }
-    /* ============================== */
-    /* Weather Card */
-    /* ============================== */
 
-    async updateWeather(weather){
+/* ==========================================
+   Cards
+========================================== */
 
-        if(!weather) return;
+function updateDashboardCards(){
 
-        document.getElementById(
-            "weatherTemp"
-        ).textContent=
-        weather.temp+"°C";
+    $("#dashboardAthleteCount").textContent=
 
-        document.getElementById(
-            "weatherStatus"
-        ).textContent=
-        weather.status;
+        Dashboard.athleteCount;
 
-    }
+    $("#todayAnalysis").textContent=
 
-    /* ============================== */
-    /* Athlete Ranking */
-    /* ============================== */
+        Dashboard.todayAnalysis;
 
-    async renderRanking(){
+    $("#averageScore").textContent=
 
-        const reports=
+        Dashboard.averageScore;
 
-        await this.firebase.loadReports();
+    $("#nationalPercent").textContent=
 
-        reports.sort(
+        Dashboard.bestScore+"%";
 
-            (a,b)=>
+}
+/* ==========================================
+   Dashboard Chart
+========================================== */
 
-            (b.score||0)-
+let dashboardChart = null;
 
-            (a.score||0)
+function initializeDashboardChart(){
 
-        );
+    const canvas = $("#dashboardChart");
 
-        const list=
+    if(!canvas) return;
 
-        document.getElementById(
+    dashboardChart = new Chart(
 
-            "rankingList"
+        canvas,
 
-        );
+        {
 
-        if(!list) return;
+            type:"line",
 
-        list.innerHTML="";
+            data:{
 
-        reports.slice(0,10).forEach(
+                labels:[],
 
-            (item,index)=>{
+                datasets:[
 
-                const row=
+                    {
 
-                document.createElement("div");
+                        label:"AI 점수",
 
-                row.className=
+                        data:[],
 
-                "ranking-item";
+                        borderWidth:3,
 
-                row.innerHTML=`
+                        tension:0.35,
 
-                    <span>#${index+1}</span>
+                        fill:false
 
-                    <span>${item.name??"선수"}</span>
+                    }
 
-                    <span>${item.score}</span>
+                ]
 
-                `;
+            },
 
-                list.appendChild(row);
+            options:{
+
+                responsive:true,
+
+                maintainAspectRatio:false,
+
+                animation:false
 
             }
 
+        }
+
+    );
+
+}
+
+/* ==========================================
+   Update Chart
+========================================== */
+
+function updateDashboardChart(){
+
+    if(!dashboardChart) return;
+
+    const recent =
+
+        App.analysis.slice(-10);
+
+    dashboardChart.data.labels =
+
+        recent.map(
+
+            (_,index)=>
+
+            index+1
+
         );
 
-    }
+    dashboardChart.data.datasets[0].data =
 
-    /* ============================== */
-    /* Today Schedule */
-    /* ============================== */
+        recent.map(
 
-    renderSchedule(schedule=[]){
-
-        const list=
-
-        document.getElementById(
-
-            "todaySchedule"
+            item=>item.score
 
         );
 
-        if(!list) return;
+    dashboardChart.update();
 
-        list.innerHTML="";
+}
 
-        schedule.forEach(item=>{
+/* ==========================================
+   Recent Analysis
+========================================== */
 
-            const div=
+function updateRecentAnalysis(){
+
+    const target=$("#recentAnalysis");
+
+    if(!target) return;
+
+    target.innerHTML="";
+
+    const recent=
+
+        App.analysis
+
+        .slice(-5)
+
+        .reverse();
+
+    recent.forEach(item=>{
+
+        const div=
 
             document.createElement("div");
 
-            div.className="schedule-item";
+        div.className=
 
-            div.innerHTML=`
+            "recent-item";
 
-                <strong>${item.time}</strong>
+        div.innerHTML=`
 
-                <span>${item.title}</span>
+<b>${item.name||"선수"}</b>
 
-            `;
+<span>${item.score}점</span>
 
-            list.appendChild(div);
+`;
 
-        });
+        target.appendChild(div);
+
+    });
+
+}
+
+/* ==========================================
+   Best Athlete
+========================================== */
+
+function getBestAthlete(){
+
+    if(App.analysis.length===0){
+
+        return null;
 
     }
 
-    /* ============================== */
-    /* Notification */
-    /* ============================== */
+    return App.analysis.reduce(
 
-    showNotification(message){
+        (best,current)=>
 
-        const box=
+        current.score>
 
-        document.getElementById(
+        best.score
 
-            "dashboardNotification"
+        ?current
+
+        :best
+
+    );
+
+}
+
+/* ==========================================
+   AI Coach
+========================================== */
+
+function updateTodayCoach(){
+
+    const coach=$("#todayCoach");
+
+    if(!coach) return;
+
+    const best=
+
+        getBestAthlete();
+
+    if(!best){
+
+        coach.textContent=
+
+        "오늘 분석 데이터가 없습니다.";
+
+        return;
+
+    }
+
+    coach.innerHTML=`
+
+🏆 최고 점수
+
+<b>${best.score}</b>
+
+<br>
+
+선수 :
+
+${best.name||"-"}
+
+`;
+
+}
+/* ==========================================
+   Sport Statistics
+========================================== */
+
+function calculateSportStatistics(){
+
+    const stats={};
+
+    App.analysis.forEach(item=>{
+
+        const sport=item.sport||"기타";
+
+        if(!stats[sport]){
+
+            stats[sport]={
+
+                count:0,
+
+                total:0,
+
+                best:0
+
+            };
+
+        }
+
+        stats[sport].count++;
+
+        stats[sport].total+=item.score;
+
+        stats[sport].best=Math.max(
+
+            stats[sport].best,
+
+            item.score
 
         );
 
-        if(!box) return;
+    });
 
-        box.textContent=message;
+    return stats;
 
-        box.classList.add("show");
+}
 
-        setTimeout(()=>{
+/* ==========================================
+   Dashboard Progress
+========================================== */
 
-            box.classList.remove("show");
+function calculateProgress(){
 
-        },3000);
+    if(App.analysis.length===0){
 
-    }
-
-    /* ============================== */
-    /* Dashboard Theme */
-    /* ============================== */
-
-    changeTheme(theme){
-
-        document.body.dataset.theme=
-
-        theme;
+        return 0;
 
     }
 
-    /* ============================== */
-    /* Full Refresh */
-    /* ============================== */
+    const average=
 
-    async reload(){
+        Dashboard.averageScore;
 
-        await this.refresh();
+    return Math.min(
 
-        await this.renderRanking();
+        100,
+
+        Math.round(
+
+            average
+
+        )
+
+    );
+
+}
+
+/* ==========================================
+   Risk Level
+========================================== */
+
+function getRiskLevel(){
+
+    if(Analysis.stability>=95)
+
+        return{
+
+            text:"매우 안정",
+
+            color:"#16a34a"
+
+        };
+
+    if(Analysis.stability>=85)
+
+        return{
+
+            text:"안정",
+
+            color:"#3b82f6"
+
+        };
+
+    if(Analysis.stability>=70)
+
+        return{
+
+            text:"주의",
+
+            color:"#f59e0b"
+
+        };
+
+    return{
+
+        text:"위험",
+
+        color:"#ef4444"
+
+    };
+
+}
+
+/* ==========================================
+   AI Status
+========================================== */
+
+function updateAIStatus(){
+
+    const risk=
+
+        getRiskLevel();
+
+    const el=$("#aiStatus");
+
+    if(!el) return;
+
+    el.textContent=
+
+        risk.text;
+
+    el.style.color=
+
+        risk.color;
+
+}
+
+/* ==========================================
+   Achievement
+========================================== */
+
+function updateAchievement(){
+
+    const target=
+
+        $("#achievementRate");
+
+    if(!target) return;
+
+    target.textContent=
+
+        calculateProgress()+"%";
+
+}
+
+/* ==========================================
+   Dashboard Refresh
+========================================== */
+
+function refreshDashboardAll(){
+
+    calculateDashboard();
+
+    updateDashboardCards();
+
+    updateDashboardChart();
+
+    updateRecentAnalysis();
+
+    updateTodayCoach();
+
+    updateAchievement();
+
+    updateAIStatus();
+
+}
+/* ==========================================
+   Notification Center
+========================================== */
+
+const NotificationCenter = {
+
+    list:[]
+
+};
+
+function pushNotification(title,message){
+
+    NotificationCenter.list.unshift({
+
+        title,
+
+        message,
+
+        time:new Date().toLocaleTimeString()
+
+    });
+
+    if(NotificationCenter.list.length>20){
+
+        NotificationCenter.list.pop();
+
+    }
+
+    renderNotifications();
+
+}
+
+function renderNotifications(){
+
+    const target=$("#notificationList");
+
+    if(!target) return;
+
+    target.innerHTML="";
+
+    NotificationCenter.list.forEach(item=>{
+
+        const div=document.createElement("div");
+
+        div.className="notification-item";
+
+        div.innerHTML=`
+
+<strong>${item.title}</strong>
+
+<p>${item.message}</p>
+
+<small>${item.time}</small>
+
+`;
+
+        target.appendChild(div);
+
+    });
+
+}
+
+/* ==========================================
+   Clock
+========================================== */
+
+function updateClock(){
+
+    const target=$("#currentTime");
+
+    if(!target) return;
+
+    target.textContent=
+
+        new Date().toLocaleString();
+
+}
+
+setInterval(updateClock,1000);
+
+/* ==========================================
+   System Status
+========================================== */
+
+function updateSystemStatus(){
+
+    const target=$("#systemStatus");
+
+    if(!target) return;
+
+    target.textContent=
+
+        "정상 작동";
+
+}
+
+/* ==========================================
+   Memory
+========================================== */
+
+function updateMemoryInfo(){
+
+    const target=$("#memoryInfo");
+
+    if(!target) return;
+
+    if(performance.memory){
+
+        target.textContent=
+
+            Math.round(
+
+                performance.memory.usedJSHeapSize/
+
+                1024/
+
+                1024
+
+            )+" MB";
+
+    }else{
+
+        target.textContent="지원 안함";
 
     }
 
 }
+
+/* ==========================================
+   Version
+========================================== */
+
+function updateVersion(){
+
+    const target=$("#versionText");
+
+    if(!target) return;
+
+    target.textContent=
+
+        SSPRO.version;
+
+}
+
+/* ==========================================
+   Dashboard Init
+========================================== */
+
+function initializeDashboard(){
+
+    initializeDashboardChart();
+
+    refreshDashboardAll();
+
+    updateClock();
+
+    updateSystemStatus();
+
+    updateMemoryInfo();
+
+    updateVersion();
+
+}
+
+console.log("📊 Dashboard Module Loaded");
