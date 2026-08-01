@@ -10885,3 +10885,30 @@ document.addEventListener(
         );
     }
 );
+/* ===========================================
+   Camera Switch
+=========================================== */
+
+async function switchCamera() {
+
+    currentFacingMode =
+        currentFacingMode === "user"
+            ? "environment"
+            : "user";
+
+    stopLiveCamera(false);
+
+    setTimeout(async () => {
+
+        await startLiveCamera();
+
+    }, 300);
+
+}
+
+document
+.getElementById("switchCameraButton")
+?.addEventListener(
+    "click",
+    switchCamera
+);
