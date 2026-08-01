@@ -1,779 +1,471 @@
-/*
-=========================================
-report.js
-설천고 스포츠과학센터 PRO
-AI Report Engine
-Version 1.0
-=========================================
-*/
+/* ==========================================
+   Report Module
+========================================== */
 
 "use strict";
 
-class ReportEngine{
+const Report = {
 
-    constructor(){
+    score:0,
 
-        this.analysis=null;
+    grade:"-",
 
-        this.athlete=null;
+    recommendation:[],
 
-        this.chart=null;
+    created:new Date()
 
-    }
+};
 
-    /* =============================== */
+/* ==========================================
+   Generate Report
+========================================== */
 
-    create(analysis,athlete){
+function generateReport(){
 
-        this.analysis=analysis;
+    Report.score=Analysis.score;
 
-        this.athlete=athlete;
+    Report.grade=calculateReportGrade();
 
-        this.renderSummary();
+    Report.recommendation=
 
-        this.renderScores();
+        createRecommendation();
 
-        this.renderFeedback();
+    updateReport();
 
-        this.renderRecommendation();
+}
 
-        this.renderNational();
+/* ==========================================
+   Grade
+========================================== */
 
-    }
+function calculateReportGrade(){
 
-    /* =============================== */
+    const score=Analysis.score;
 
-    renderSummary(){
+    if(score>=95) return "S";
 
-        document.getElementById(
+    if(score>=90) return "A+";
 
-            "reportGrade"
+    if(score>=85) return "A";
 
-        ).textContent=
+    if(score>=80) return "B+";
 
-        this.analysis.grade;
+    if(score>=75) return "B";
 
-        document.getElementById(
+    if(score>=70) return "C";
 
-            "reportScore"
+    return "D";
 
-        ).textContent=
+}
 
-        this.analysis.score+"점";
+/* ==========================================
+   Update UI
+========================================== */
 
-        document.getElementById(
+function updateReport(){
 
-            "reportRisk"
+    $("#reportScore").textContent=
 
-        ).textContent=
+        Report.score;
 
-        this.analysis.risk;
+    $("#reportGrade").textContent=
 
-    }
+        Report.grade;
 
-    /* =============================== */
+    $("#trainingLevel").textContent=
 
-    renderScores(){
+        getTrainingLevel();
 
-        document.getElementById(
+    $("#reportRisk").textContent=
 
-            "depthScore"
+        getRisk();
 
-        ).textContent=
+    updateReportChart();
 
-        this.analysis.detail.depth;
+    updateReportFeedback();
 
-        document.getElementById(
+}
+/* ==========================================
+   Report Chart
+========================================== */
 
-            "balanceScore"
+function updateReportChart(){
 
-        ).textContent=
+    if(!reportChart) return;
 
-        this.analysis.detail.balance;
+    reportChart.data.labels=[
 
-        document.getElementById(
+        "AI 점수",
 
-            "postureScore"
+        "균형",
 
-        ).textContent=
+        "자세",
 
-        this.analysis.detail.posture;
+        "안정성"
 
-        document.getElementById(
+    ];
 
-            "stabilityScore"
+    reportChart.data.datasets=[
 
-        ).textContent=
+        {
 
-        this.analysis.detail.stability;
+            label:"현재",
 
-        document.getElementById(
+            data:[
 
-            "movementScore"
+                Analysis.score,
 
-        ).textContent=
+                Analysis.balance,
 
-        this.analysis.detail.movement;
+                Analysis.posture,
 
-    }
+                Analysis.stability
 
-    /* =============================== */
+            ],
 
-    renderFeedback(){
+            backgroundColor:"#4F8CFF"
 
-        const box=
+        }
 
-        document.getElementById(
+    ];
 
-            "reportFeedback"
+    reportChart.update();
+
+}
+
+/* ==========================================
+   AI Feedback
+========================================== */
+
+function updateReportFeedback(){
+
+    const feedback=[];
+
+    if(Analysis.score>=95){
+
+        feedback.push(
+
+            "🏆 국가대표 수준의 자세입니다."
 
         );
 
-        box.innerHTML="";
+    }
 
-        this.analysis.feedback.forEach(item=>{
+    if(Analysis.balance<90){
 
-            box.innerHTML+=`
+        feedback.push(
 
-            <div class="feedback">
+            "⚖ 좌우 균형 훈련을 추천합니다."
 
-                <h4>${item.title}</h4>
+        );
 
-                <p>${item.message}</p>
+    }
 
-            </div>
+    if(Analysis.posture<90){
 
-            `;
+        feedback.push(
+
+            "🦴 상체 자세를 조금 더 세워주세요."
+
+        );
+
+    }
+
+    if(Analysis.stability<90){
+
+        feedback.push(
+
+            "🦵 코어 안정성 운동이 필요합니다."
+
+        );
+
+    }
+
+    if(Biathlon.totalScore>90){
+
+        feedback.push(
+
+            "🎿 바이애슬론 활주 효율이 매우 좋습니다."
+
+        );
+
+    }
+
+    if(feedback.length===0){
+
+        feedback.push(
+
+            "🤖 분석 결과를 기다리는 중입니다."
+
+        );
+
+    }
+
+    $("#reportFeedback").innerHTML=
+
+        feedback.join("<br><br>");
+
+}
+
+/* ==========================================
+   Training Level
+========================================== */
+
+function getTrainingLevel(){
+
+    if(Analysis.score>=95)
+
+        return "국가대표";
+
+    if(Analysis.score>=90)
+
+        return "엘리트";
+
+    if(Analysis.score>=80)
+
+        return "선수";
+
+    if(Analysis.score>=70)
+
+        return "성장";
+
+    return "기초";
+
+}
+
+/* ==========================================
+   Strength / Weakness
+========================================== */
+
+function getStrengths(){
+
+    const list=[];
+
+    if(Analysis.balance>=90)
+
+        list.push("균형");
+
+    if(Analysis.posture>=90)
+
+        list.push("자세");
+
+    if(Analysis.stability>=90)
+
+        list.push("안정성");
+
+    return list;
+
+}
+
+function getWeaknesses(){
+
+    const list=[];
+
+    if(Analysis.balance<90)
+
+        list.push("균형");
+
+    if(Analysis.posture<90)
+
+        list.push("자세");
+
+    if(Analysis.stability<90)
+
+        list.push("안정성");
+
+    return list;
+
+}
+/* ==========================================
+   Report Events
+========================================== */
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+    $("#pdfButton")?.addEventListener(
+
+        "click",
+
+        exportPDF
+
+    );
+
+    $("#printButton")?.addEventListener(
+
+        "click",
+
+        printReport
+
+    );
+
+    $("#shareButton")?.addEventListener(
+
+        "click",
+
+        shareReport
+
+    );
+
+});
+
+/* ==========================================
+   Export PDF
+========================================== */
+
+function exportPDF(){
+
+    const report={
+
+        date:new Date().toLocaleString(),
+
+        sport:Analysis.sport,
+
+        score:Analysis.score,
+
+        grade:Report.grade,
+
+        balance:Analysis.balance,
+
+        posture:Analysis.posture,
+
+        stability:Analysis.stability,
+
+        recommendation:Report.recommendation
+
+    };
+
+    const blob=new Blob(
+
+        [
+
+            JSON.stringify(
+
+                report,
+
+                null,
+
+                2
+
+            )
+
+        ],
+
+        {
+
+            type:"application/json"
+
+        }
+
+    );
+
+    const url=URL.createObjectURL(blob);
+
+    const a=document.createElement("a");
+
+    a.href=url;
+
+    a.download=
+
+        `Report_${Date.now()}.json`;
+
+    a.click();
+
+    URL.revokeObjectURL(url);
+
+    showToast("리포트 저장 완료");
+
+}
+
+/* ==========================================
+   Print
+========================================== */
+
+function printReport(){
+
+    window.print();
+
+}
+
+/* ==========================================
+   Share
+========================================== */
+
+async function shareReport(){
+
+    const text=`
+
+🏆 설천고 스포츠과학센터
+
+종목 : ${Analysis.sport}
+
+AI 점수 : ${Analysis.score}
+
+등급 : ${Report.grade}
+
+균형 : ${Analysis.balance}
+
+자세 : ${Analysis.posture}
+
+안정성 : ${Analysis.stability}
+
+`;
+
+    if(navigator.share){
+
+        await navigator.share({
+
+            title:"AI Report",
+
+            text
 
         });
 
     }
 
-    /* =============================== */
+    else{
 
-    renderRecommendation(){
+        navigator.clipboard.writeText(text);
 
-        const box=
-
-        document.getElementById(
-
-            "recommendation"
-
-        );
-
-        box.innerHTML="";
-
-        this.analysis.plan.forEach(item=>{
-
-            box.innerHTML+=`
-
-            <div class="plan">
-
-                <b>${item.title}</b>
-
-                <p>${item.exercise}</p>
-
-            </div>
-
-            `;
-
-        });
-
-    }
-
-    /* =============================== */
-
-    renderNational(){
-
-        document.getElementById(
-
-            "nationalPercent"
-
-        ).textContent=
-
-        this.analysis.percent+"%";
+        showToast("클립보드에 복사되었습니다.");
 
     }
 
 }
-    /* =============================== */
-    /* Athlete Info */
-    /* =============================== */
 
-    renderAthlete(){
+/* ==========================================
+   History
+========================================== */
 
-        if(!this.athlete){
+function saveReportHistory(){
 
-            return;
+    if(!App.reportHistory){
 
-        }
-
-        document.getElementById(
-
-            "athleteName"
-
-        ).textContent=
-
-        this.athlete.name;
-
-        document.getElementById(
-
-            "athleteSport"
-
-        ).textContent=
-
-        this.athlete.sport;
-
-        document.getElementById(
-
-            "athleteAge"
-
-        ).textContent=
-
-        this.athlete.age;
-
-        document.getElementById(
-
-            "athleteHeight"
-
-        ).textContent=
-
-        this.athlete.height+" cm";
-
-        document.getElementById(
-
-            "athleteWeight"
-
-        ).textContent=
-
-        this.athlete.weight+" kg";
+        App.reportHistory=[];
 
     }
 
-    /* =============================== */
-    /* Date */
-    /* =============================== */
+    App.reportHistory.push({
 
-    renderDate(){
+        date:new Date().toLocaleString(),
 
-        const today=
+        score:Analysis.score,
 
-        new Date();
+        sport:Analysis.sport,
 
-        document.getElementById(
+        grade:Report.grade
 
-            "reportDate"
+    });
 
-        ).textContent=
+    localStorage.setItem(
 
-        today.toLocaleDateString(
+        "reportHistory",
 
-            "ko-KR"
+        JSON.stringify(
 
-        );
+            App.reportHistory
 
-    }
+        )
 
-    /* =============================== */
-    /* Star */
-    /* =============================== */
-
-    renderStar(){
-
-        document.getElementById(
-
-            "starScore"
-
-        ).textContent=
-
-        this.analysis.star;
-
-    }
-
-    /* =============================== */
-    /* Summary */
-    /* =============================== */
-
-    renderSummaryText(){
-
-        document.getElementById(
-
-            "summaryText"
-
-        ).textContent=
-
-        this.analysis.summary;
-
-    }
-
-    /* =============================== */
-    /* Chart */
-    /* =============================== */
-
-    createChart(){
-
-        const ctx=
-
-        document.getElementById(
-
-            "reportChart"
-
-        );
-
-        if(!ctx){
-
-            return;
-
-        }
-
-        this.chart=
-
-        new Chart(
-
-            ctx,
-
-            {
-
-                type:"radar",
-
-                data:{
-
-                    labels:[
-
-                        "Depth",
-
-                        "Balance",
-
-                        "Posture",
-
-                        "Stability",
-
-                        "Movement"
-
-                    ],
-
-                    datasets:[{
-
-                        label:"AI Score",
-
-                        data:[
-
-                            this.analysis.detail.depth,
-
-                            this.analysis.detail.balance,
-
-                            this.analysis.detail.posture,
-
-                            this.analysis.detail.stability,
-
-                            this.analysis.detail.movement
-
-                        ],
-
-                        fill:true,
-
-                        borderWidth:2
-
-                    }]
-
-                },
-
-                options:{
-
-                    responsive:true,
-
-                    maintainAspectRatio:false,
-
-                    animation:false
-
-                }
-
-            }
-
-        );
-
-    }
-
-    /* =============================== */
-    /* National Chart */
-    /* =============================== */
-
-    createNationalChart(){
-
-        const ctx=
-
-        document.getElementById(
-
-            "nationalChart"
-
-        );
-
-        if(!ctx){
-
-            return;
-
-        }
-
-        new Chart(
-
-            ctx,
-
-            {
-
-                type:"bar",
-
-                data:{
-
-                    labels:[
-
-                        "선수",
-
-                        "국가대표"
-
-                    ],
-
-                    datasets:[{
-
-                        data:[
-
-                            this.analysis.score,
-
-                            92
-
-                        ]
-
-                    }]
-
-                },
-
-                options:{
-
-                    responsive:true,
-
-                    maintainAspectRatio:false
-
-                }
-
-            }
-
-        );
-
-    }
-
-    /* =============================== */
-    /* Update */
-    /* =============================== */
-
-    update(){
-
-        this.renderAthlete();
-
-        this.renderDate();
-
-        this.renderStar();
-
-        this.renderSummaryText();
-
-        this.createChart();
-
-        this.createNationalChart();
-
-    }
-        /* =============================== */
-    /* Export PDF */
-    /* =============================== */
-
-    async exportPDF(){
-
-        const target =
-        document.getElementById("reportArea");
-
-        if(!target){
-
-            alert("리포트 영역이 없습니다.");
-
-            return;
-
-        }
-
-        const canvas = await html2canvas(
-
-            target,
-
-            {
-
-                scale:2,
-
-                backgroundColor:"#10141d"
-
-            }
-
-        );
-
-        const image = canvas.toDataURL(
-
-            "image/png"
-
-        );
-
-        const pdf = new jspdf.jsPDF(
-
-            "p",
-
-            "mm",
-
-            "a4"
-
-        );
-
-        const width = 190;
-
-        const height =
-
-        canvas.height *
-
-        width /
-
-        canvas.width;
-
-        pdf.addImage(
-
-            image,
-
-            "PNG",
-
-            10,
-
-            10,
-
-            width,
-
-            height
-
-        );
-
-        pdf.save(
-
-            "Seolcheon_Report.pdf"
-
-        );
-
-    }
-
-    /* =============================== */
-    /* Print */
-    /* =============================== */
-
-    printReport(){
-
-        window.print();
-
-    }
-
-    /* =============================== */
-    /* Save JSON */
-    /* =============================== */
-
-    downloadJSON(){
-
-        const blob = new Blob(
-
-            [
-
-                JSON.stringify(
-
-                    this.analysis,
-
-                    null,
-
-                    2
-
-                )
-
-            ],
-
-            {
-
-                type:
-
-                "application/json"
-
-            }
-
-        );
-
-        const url =
-
-        URL.createObjectURL(blob);
-
-        const a =
-
-        document.createElement("a");
-
-        a.href = url;
-
-        a.download =
-
-        "analysis.json";
-
-        a.click();
-
-        URL.revokeObjectURL(url);
-
-    }
-
-    /* =============================== */
-    /* Monthly Report */
-    /* =============================== */
-
-    renderMonthly(history=[]){
-
-        const avg =
-
-        history.length
-
-        ?
-
-        history.reduce(
-
-            (s,v)=>s+v.score,
-
-            0
-
-        )/history.length
-
-        :
-
-        this.analysis.score;
-
-        document.getElementById(
-
-            "monthlyAverage"
-
-        ).textContent=
-
-        avg.toFixed(1);
-
-    }
-
-    /* =============================== */
-    /* Performance Badge */
-    /* =============================== */
-
-    renderBadge(){
-
-        let badge="🥉";
-
-        if(this.analysis.score>=90){
-
-            badge="🥇";
-
-        }
-
-        else if(this.analysis.score>=80){
-
-            badge="🥈";
-
-        }
-
-        document.getElementById(
-
-            "performanceBadge"
-
-        ).textContent=
-
-        badge;
-
-    }
-
-    /* =============================== */
-    /* National Compare Table */
-    /* =============================== */
-
-    renderCompareTable(){
-
-        document.getElementById(
-
-            "compareScore"
-
-        ).textContent=
-
-        this.analysis.score;
-
-        document.getElementById(
-
-            "compareNational"
-
-        ).textContent=
-
-        "92";
-
-        document.getElementById(
-
-            "compareGap"
-
-        ).textContent=
-
-        this.analysis.score-92;
-
-    }
-
-    /* =============================== */
-    /* AI Comment */
-    /* =============================== */
-
-    renderAIComment(){
-
-        let text="";
-
-        if(this.analysis.score>=95){
-
-            text=
-
-            "국가대표 수준의 자세입니다.";
-
-        }
-
-        else if(this.analysis.score>=85){
-
-            text=
-
-            "우수한 자세입니다.";
-
-        }
-
-        else{
-
-            text=
-
-            "기본 자세 교정이 필요합니다.";
-
-        }
-
-        document.getElementById(
-
-            "aiComment"
-
-        ).textContent=text;
-
-    }
-
-    /* =============================== */
-    /* Finish */
-    /* =============================== */
-
-    finish(history=[]){
-
-        this.update();
-
-        this.renderMonthly(history);
-
-        this.renderBadge();
-
-        this.renderCompareTable();
-
-        this.renderAIComment();
-
-    }
+    );
 
 }
