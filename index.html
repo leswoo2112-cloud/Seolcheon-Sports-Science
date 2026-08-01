@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>
+설천고 스포츠과학 훈련센터 PRO
+</title>
+
+<!-- Font -->
+<link
+rel="preconnect"
+href="https://fonts.googleapis.com">
+
+<link
+rel="preconnect"
+href="https://fonts.gstatic.com"
+crossorigin>
+
+<link
+href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap"
+rel="stylesheet">
+
+<!-- CSS -->
+<link
+rel="stylesheet"
+href="style.css">
+
+<!-- Chart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- MediaPipe -->
+
+<script defer
+src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+<script defer
+src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+
+<script defer
+src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
+
+</head>
+
+<body>
+
+<div id="app">
+
+<header class="topbar">
+
+<div class="logo">
+
+🏔
+
+<span>
+
+설천고 스포츠과학 훈련센터
+
+</span>
+
+</div>
+
+<div class="top-right">
+
+<div id="clock">
+
+00:00:00
+
+</div>
+
+<div id="today">
+
+2026-08-01
+
+</div>
+
+</div>
+
+</header>
+
+<div class="layout">
+
+<!-- Sidebar -->
+
+<aside class="sidebar">
+
+<button
+class="menu active"
+data-page="dashboard">
+
+🏠
+대시보드
+
+</button>
+
+<button
+class="menu"
+data-page="athlete">
+
+👤
+선수관리
+
+</button>
+
+<button
+class="menu"
+data-page="sports">
+
+🎿
+종목훈련
+
+</button>
+
+<button
+class="menu"
+data-page="weight">
+
+🏋️
+웨이트
+
+</button>
+
+<button
+class="menu"
+data-page="entrance">
+
+🎓
+체대입시
+
+</button>
+
+<button
+class="menu"
+data-page="camera">
+
+📷
+AI 실시간
+
+</button>
+
+<button
+class="menu"
+data-page="video">
+
+🎥
+영상분석
+
+</button>
+
+<button
+class="menu"
+data-page="report">
+
+📊
+리포트
+
+</button>
+
+<button
+class="menu"
+data-page="setting">
+
+⚙
+설정
+
+</button>
+
+</aside>
+
+<main class="content">
+
+<section
+id="dashboardPage"
+class="page active">
+
+<h1>
+
+Dashboard
+
+</h1>
+
+<div class="dashboard-grid">
+
+<div class="card">
+
+<h3>
+
+등록 선수
+
+</h3>
+
+<div
+id="athleteCount"
+class="number">
+
+0
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>
+
+오늘 훈련
+
+</h3>
+
+<div
+id="trainingCount"
+class="number">
+
+0
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>
+
+평균 점수
+
+</h3>
+
+<div
+id="averageScore"
+class="number">
+
+0
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>
+
+AI 분석
+
+</h3>
+
+<div
+id="analysisCount"
+class="number">
+
+0
+
+</div>
+
+</div>
+
+</div>
+
+<div class="dashboard-row">
+
+<div class="large-card">
+
+<h2>
+
+훈련 현황
+
+</h2>
+
+<canvas
+id="dashboardChart">
+
+</canvas>
+
+</div>
+
+<div class="large-card">
+
+<h2>
+
+AI 추천
+
+</h2>
+
+<div
+id="aiCoach">
+
+오늘은
+하체 근력과
+코어 운동을
+추천합니다.
+
+</div>
+
+</div>
+
+</div>
+<!-- ========================= -->
+<!-- 선수관리 -->
+<!-- ========================= -->
+
+<section id="athletePage" class="page">
+
+<h1>선수 관리</h1>
+
+<div class="page-grid">
+
+<div class="card">
+
+<h2>선수 등록</h2>
+
+<div class="form-grid">
+
+<input id="athleteName" placeholder="이름">
+
+<input id="athleteGrade" placeholder="학년">
+
+<input id="athleteClass" placeholder="반">
+
+<input id="athleteNumber" placeholder="번호">
+
+<select id="athleteGender">
+
+<option>남</option>
+<option>여</option>
+
+</select>
+
+<select id="athleteSport">
+
+<option>바이애슬론</option>
+<option>크로스컨트리</option>
+<option>알파인</option>
+<option>농구</option>
+<option>축구</option>
+<option>배구</option>
+<option>육상</option>
+<option>태권도</option>
+<option>유도</option>
+<option>사격</option>
+
+</select>
+
+<input
+type="number"
+id="athleteHeight"
+placeholder="키(cm)">
+
+<input
+type="number"
+id="athleteWeight"
+placeholder="몸무게">
+
+<input
+type="number"
+id="bodyFat"
+placeholder="체지방률">
+
+<input
+type="number"
+id="muscleMass"
+placeholder="골격근량">
+
+<textarea
+id="athleteMemo"
+placeholder="메모">
+
+</textarea>
+
+<button id="saveAthlete">
+
+선수 등록
+
+</button>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>등록 선수</h2>
+
+<table class="table">
+
+<thead>
+
+<tr>
+
+<th>이름</th>
+<th>종목</th>
+<th>키</th>
+<th>몸무게</th>
+<th>관리</th>
+
+</tr>
+
+</thead>
+
+<tbody id="athleteTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ========================= -->
+<!-- 종목훈련 -->
+<!-- ========================= -->
+
+<section id="sportsPage" class="page">
+
+<h1>종목훈련</h1>
+
+<div class="page-grid">
+
+<div class="card">
+
+<h2>훈련 입력</h2>
+
+<select id="sportsAthlete">
+
+</select>
+
+<select id="sportsCategory">
+
+<optgroup label="겨울">
+
+<option>바이애슬론</option>
+<option>크로스컨트리</option>
+<option>알파인</option>
+<option>스노보드</option>
+<option>스키점프</option>
+
+</optgroup>
+
+<optgroup label="육상">
+
+<option>100m</option>
+<option>200m</option>
+<option>400m</option>
+<option>800m</option>
+<option>1500m</option>
+
+</optgroup>
+
+<optgroup label="구기">
+
+<option>농구</option>
+<option>축구</option>
+<option>배구</option>
+<option>야구</option>
+
+</optgroup>
+
+</select>
+
+<input
+type="date"
+id="sportsDate">
+
+<input
+type="number"
+id="sportsTime"
+placeholder="훈련시간">
+
+<input
+type="number"
+id="sportsScore"
+placeholder="훈련점수">
+
+<textarea
+id="sportsMemo"
+placeholder="훈련메모">
+
+</textarea>
+
+<button id="saveSports">
+
+훈련 저장
+
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>최근 훈련</h2>
+
+<table class="table">
+
+<thead>
+
+<tr>
+
+<th>날짜</th>
+<th>선수</th>
+<th>종목</th>
+<th>점수</th>
+
+</tr>
+
+</thead>
+
+<tbody id="sportsTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ========================= -->
+<!-- 웨이트 -->
+<!-- ========================= -->
+
+<section id="weightPage" class="page">
+
+<h1>웨이트</h1>
+
+<div class="page-grid">
+
+<div class="card">
+
+<h2>운동 입력</h2>
+
+<select id="weightExercise">
+
+<option>스쿼트</option>
+<option>벤치프레스</option>
+<option>데드리프트</option>
+<option>오버헤드프레스</option>
+<option>랫풀다운</option>
+<option>풀업</option>
+<option>레그프레스</option>
+
+</select>
+
+<input
+type="number"
+id="weightKg"
+placeholder="무게">
+
+<input
+type="number"
+id="weightRep"
+placeholder="횟수">
+
+<input
+type="number"
+id="weightSet"
+placeholder="세트">
+
+<button id="saveWeight">
+
+저장
+
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>AI 분석</h2>
+
+<div id="oneRM">
+
+예상 1RM : 0kg
+
+</div>
+
+<div id="fatigue">
+
+피로도 : -
+
+</div>
+
+<div id="recommendWeight">
+
+추천 무게 : -
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ========================= -->
+<!-- 체대입시 -->
+<!-- ========================= -->
+
+<section id="entrancePage" class="page">
+
+<h1>체대입시</h1>
+
+<div class="page-grid">
+
+<div class="card">
+
+<h2>학교 선택</h2>
+
+<select id="collegeSelect">
+
+<option>한국체대</option>
+<option>용인대</option>
+<option>경희대</option>
+<option>중앙대</option>
+<option>동국대</option>
+<option>계명대</option>
+
+</select>
+
+<input
+type="number"
+placeholder="100m">
+
+<input
+type="number"
+placeholder="제자리멀리뛰기">
+
+<input
+type="number"
+placeholder="메디신볼">
+
+<input
+type="number"
+placeholder="윗몸일으키기">
+
+<button>
+
+환산점수 계산
+
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>결과</h2>
+
+<div id="collegeResult">
+
+환산점수
+
+</div>
+
+<div id="collegeRank">
+
+지원 가능 대학
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+<!-- ========================= -->
+<!-- AI 실시간 분석 -->
+<!-- ========================= -->
+
+<section id="cameraPage" class="page">
+
+<h1>AI 실시간 자세 분석</h1>
+
+<div class="camera-layout">
+
+<div class="camera-view">
+
+<video
+id="cameraVideo"
+autoplay
+playsinline
+muted>
+</video>
+
+<canvas
+id="poseCanvas">
+</canvas>
+
+<div class="cross-line horizontal"></div>
+<div class="cross-line vertical"></div>
+
+<div class="center-point"></div>
+
+</div>
+
+<div class="camera-side">
+
+<div class="score-card">
+
+<h2>AI SCORE</h2>
+
+<div id="overallScore">
+
+0점
+
+</div>
+
+</div>
+
+<div class="joint-card">
+
+<h3>관절 각도</h3>
+
+<table class="table">
+
+<tr>
+
+<td>Head</td>
+
+<td id="headAngle">
+
+0°
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>Shoulder</td>
+
+<td id="shoulderAngle">
+
+0°
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>Trunk</td>
+
+<td id="trunkAngle">
+
+0°
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>Hip</td>
+
+<td id="hipAngle">
+
+0°
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>Knee</td>
+
+<td id="kneeAngle">
+
+0°
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>Ankle</td>
+
+<td id="ankleAngle">
+
+0°
+
+</td>
+
+</tr>
+
+</table>
+
+</div>
+
+<div class="feedback-card">
+
+<h3>AI 피드백</h3>
+
+<ul id="aiFeedback">
+
+<li>카메라를 시작하세요.</li>
+
+</ul>
+
+</div>
+
+<div class="button-group">
+
+<button id="startCamera">
+
+카메라 시작
+
+</button>
+
+<button id="stopCamera">
+
+종료
+
+</button>
+
+<button id="savePose">
+
+기록 저장
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ========================= -->
+<!-- 영상 분석 -->
+<!-- ========================= -->
+
+<section id="videoPage" class="page">
+
+<h1>영상 분석</h1>
+
+<div class="video-layout">
+
+<div class="video-left">
+
+<input
+type="file"
+id="videoUpload"
+accept="video/*">
+
+<video
+id="analysisVideo"
+controls>
+</video>
+
+<div class="video-buttons">
+
+<button id="playSlow">
+
+0.25x
+
+</button>
+
+<button id="playNormal">
+
+1x
+
+</button>
+
+<button id="previousFrame">
+
+◀ Frame
+
+</button>
+
+<button id="nextFrame">
+
+Frame ▶
+
+</button>
+
+</div>
+
+</div>
+
+<div class="video-right">
+
+<div class="card">
+
+<h2>영상 AI 분석</h2>
+
+<p>
+
+관절 33개 추적
+
+</p>
+
+<p>
+
+스켈레톤 표시
+
+</p>
+
+<p>
+
+중심선 표시
+
+</p>
+
+<p>
+
+각도 계산
+
+</p>
+
+<p>
+
+무게중심(COM)
+
+</p>
+
+</div>
+
+<div class="card">
+
+<h2>실시간 분석 결과</h2>
+
+<div id="videoAnalysis">
+
+영상을 업로드하세요.
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>국가대표 비교</h2>
+
+<button id="compareVideo">
+
+국가대표 영상과 비교
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ========================= -->
+<!-- Report -->
+<!-- ========================= -->
+
+<section id="reportPage" class="page">
+
+<h1>훈련 리포트</h1>
+
+<div class="report-grid">
+
+<div class="card">
+
+<h2>총 훈련</h2>
+
+<div id="reportTraining">
+
+0
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>평균 점수</h2>
+
+<div id="reportAverage">
+
+0
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>최고 점수</h2>
+
+<div id="reportBest">
+
+0
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>AI 평가</h2>
+
+<div id="reportAI">
+
+-
+
+</div>
+
+</div>
+
+</div>
+
+<div class="chart-card">
+
+<canvas id="scoreChart"></canvas>
+
+</div>
+
+<div class="chart-card">
+
+<canvas id="trainingChart"></canvas>
+
+</div>
+
+<div class="button-group">
+
+<button id="pdfReport">
+
+PDF 출력
+
+</button>
+
+<button id="csvReport">
+
+CSV 저장
+
+</button>
+
+</div>
+
+</section>
+<!-- ========================= -->
+<!-- 설정 -->
+<!-- ========================= -->
+
+<section id="settingPage" class="page">
+
+<h1>설정</h1>
+
+<div class="setting-grid">
+
+<div class="card">
+
+<h2>일반</h2>
+
+<label>
+
+<input
+type="checkbox"
+id="darkMode"
+checked>
+
+다크모드
+
+</label>
+
+<label>
+
+<input
+type="checkbox"
+id="soundEffect"
+checked>
+
+효과음
+
+</label>
+
+<label>
+
+<input
+type="checkbox"
+id="autoSave"
+checked>
+
+자동저장
+
+</label>
+
+</div>
+
+<div class="card">
+
+<h2>데이터</h2>
+
+<button id="backupData">
+
+백업
+
+</button>
+
+<button id="restoreData">
+
+복원
+
+</button>
+
+<button id="resetData">
+
+전체 초기화
+
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>Firebase</h2>
+
+<p>
+
+실시간 동기화
+
+</p>
+
+<div id="firebaseStatus">
+
+연결 준비
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+<!-- ========================= -->
+<!-- Loading -->
+<!-- ========================= -->
+
+<div id="loadingScreen">
+
+<div class="loader">
+
+<div class="spinner"></div>
+
+<h2>
+
+설천고 스포츠과학 훈련센터
+
+</h2>
+
+<p>
+
+Loading...
+
+</p>
+
+</div>
+
+</div>
+
+<!-- ========================= -->
+<!-- Toast -->
+<!-- ========================= -->
+
+<div id="toast">
+
+완료
+
+</div>
+
+<!-- ========================= -->
+<!-- Confirm -->
+<!-- ========================= -->
+
+<div
+id="confirmModal"
+class="modal">
+
+<div class="modal-box">
+
+<h2 id="confirmTitle">
+
+확인
+
+</h2>
+
+<p id="confirmMessage">
+
+계속하시겠습니까?
+
+</p>
+
+<div class="button-group">
+
+<button id="confirmYes">
+
+확인
+
+</button>
+
+<button id="confirmNo">
+
+취소
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- ========================= -->
+<!-- Footer -->
+<!-- ========================= -->
+
+<footer>
+
+<div>
+
+설천고 스포츠과학 훈련센터 PRO
+
+</div>
+
+<div>
+
+Sports Science Center
+
+2026
+
+</div>
+
+</footer>
+
+<!-- ========================= -->
+<!-- JavaScript -->
+<!-- ========================= -->
+
+<script src="utils.js"></script>
+
+<script src="app.js"></script>
+
+<script src="dashboard.js"></script>
+
+<script src="athlete.js"></script>
+
+<script src="sports.js"></script>
+
+<script src="weight.js"></script>
+
+<script src="college.js"></script>
+
+<script src="camera.js"></script>
+
+<script src="pose.js"></script>
+
+<script src="video.js"></script>
+
+<script src="analysis.js"></script>
+
+<script src="report.js"></script>
+
+<script src="firebase.js"></script>
+
+</body>
+
+</html>
