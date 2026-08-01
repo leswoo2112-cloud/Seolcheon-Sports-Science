@@ -1,1077 +1,277 @@
-/* ===========================================
-   설천고 스포츠과학 훈련센터 PRO
-   app.js Part 1
-=========================================== */
+/* ==========================================
+   App Controller
+========================================== */
 
 "use strict";
 
-/* ===========================================
-   APP
-=========================================== */
+const SSPRO = {
 
-const app = {
+    version: "3.0",
 
-    currentPage: "dashboard",
+    ready: false,
 
-    athletes: [],
+    currentSport: "바이애슬론",
 
-    sports: [],
+    currentAthlete: null,
 
-    weights: [],
-
-    poses: [],
-
-    reports: []
+    modules: {}
 
 };
 
-/* ===========================================
-   DOM
-=========================================== */
-
-const $ = (id)=>document.getElementById(id);
-
-const $$ = (q)=>document.querySelectorAll(q);
-
-/* ===========================================
-   Toast
-=========================================== */
-
-function toast(message,type="success"){
-
-    const t=$("#toast");
-
-    if(!t)return;
-
-    t.textContent=message;
-
-    t.className="";
-
-    t.classList.add("show");
-
-    if(type==="error"){
-
-        t.classList.add("error");
-
-    }
-
-    if(type==="success"){
-
-        t.classList.add("success");
-
-    }
-
-    setTimeout(()=>{
-
-        t.classList.remove("show");
-
-    },2500);
-
-}
-
-/* ===========================================
-   Page
-=========================================== */
-
-function openPage(page){
-
-    app.currentPage=page;
-
-    $$(".page").forEach(p=>{
-
-        p.classList.remove("active");
-
-    });
-
-    const target=$(page+"Page");
-
-    if(target){
-
-        target.classList.add("active");
-
-    }
-
-    $$(".menu").forEach(menu=>{
-
-        menu.classList.remove("active");
-
-    });
-
-    document
-
-    .querySelector(`[data-page="${page}"]`)
-
-    ?.classList.add("active");
-
-}
-
-/* ===========================================
-   Menu
-=========================================== */
-
-function initializeMenu(){
-
-    $$(".menu").forEach(menu=>{
-
-        menu.onclick=()=>{
-
-            openPage(menu.dataset.page);
-
-        };
-
-    });
-
-}
-
-/* ===========================================
-   Clock
-=========================================== */
-
-function updateClock(){
-
-    const clock=$("#clock");
-
-    if(!clock)return;
-
-    const now=new Date();
-
-    clock.innerHTML=
-
-    now.toLocaleTimeString(
-
-        "ko-KR"
-
-    );
-
-}
-
-setInterval(updateClock,1000);
-
-/* ===========================================
-   Loading
-=========================================== */
-
-window.onload=()=>{
-
-    setTimeout(()=>{
-
-        $("#loadingScreen")
-
-        ?.classList.add("hide");
-
-    },1000);
-
-};
-
-/* ===========================================
-   Start
-=========================================== */
-
-document.addEventListener(
-
-"DOMContentLoaded",
-
-()=>{
-
-    initializeMenu();
-
-    updateClock();
-
-    openPage("dashboard");
-
-});
-/* ===========================================
-   app.js Part 2
-   LocalStorage
-=========================================== */
-
-const STORAGE_KEY = "seolcheon_sports_center";
-
-/* ===========================================
-   저장
-=========================================== */
-
-function saveData(){
-
-    localStorage.setItem(
-
-        STORAGE_KEY,
-
-        JSON.stringify(app)
-
-    );
-
-}
-
-/* ===========================================
-   불러오기
-=========================================== */
-
-function loadData(){
-
-    const data=
-
-    localStorage.getItem(
-
-        STORAGE_KEY
-
-    );
-
-    if(!data){
-
-        return;
-
-    }
-
-    try{
-
-        const saved=
-
-        JSON.parse(data);
-
-        Object.assign(
-
-            app,
-
-            saved
-
-        );
-
-    }
-
-    catch(error){
-
-        console.error(error);
-
-    }
-
-}
-
-/* ===========================================
-   자동 저장
-=========================================== */
-
-function autoSave(){
-
-    saveData();
-
-}
-
-/* ===========================================
-   30초마다 저장
-=========================================== */
-
-setInterval(
-
-autoSave,
-
-30000
-
-);
-
-/* ===========================================
-   종료시 저장
-=========================================== */
+/* ==========================================
+   Boot
+========================================== */
 
 window.addEventListener(
 
-"beforeunload",
+    "load",
 
-saveData
+    bootApplication
 
 );
 
-/* ===========================================
-   Firebase
-=========================================== */
+async function bootApplication() {
 
-const firebaseState={
+    showLoading("프로그램 시작 중...");
 
-connected:false,
+    try {
 
-user:null
+        await initializeModules();
 
-};
+        bindEvents();
 
-function updateFirebaseStatus(){
+        loadApplication();
 
-    const status=
+        SSPRO.ready = true;
 
-    $("#firebaseStatus");
+        hideOverlay();
 
-    if(!status)return;
-
-    status.innerHTML=
-
-    firebaseState.connected
-
-    ?
-
-    "🟢 연결됨"
-
-    :
-
-    "🔴 연결안됨";
-
-}
-
-/* ===========================================
-   Backup
-=========================================== */
-
-function exportBackup(){
-
-    const blob=
-
-    new Blob(
-
-    [
-
-    JSON.stringify(
-
-    app,
-
-    null,
-
-    2
-
-    )
-
-    ],
-
-    {
-
-    type:"application/json"
+        showToast("🏆 SSPRO 시작 완료");
 
     }
 
-    );
+    catch (error) {
 
-    const url=
+        console.error(error);
 
-    URL.createObjectURL(blob);
+        hideOverlay();
 
-    const a=
+        showToast(
 
-    document.createElement("a");
+            "프로그램 시작 실패",
 
-    a.href=url;
-
-    a.download=
-
-    "Seolcheon_Backup.json";
-
-    a.click();
-
-}
-
-/* ===========================================
-   Restore
-=========================================== */
-
-function importBackup(file){
-
-    const reader=
-
-    new FileReader();
-
-    reader.onload=e=>{
-
-        app=
-
-        JSON.parse(
-
-        e.target.result
+            "error"
 
         );
 
-        saveData();
+    }
 
-        location.reload();
+}
+
+/* ==========================================
+   Module Init
+========================================== */
+
+async function initializeModules() {
+
+    if (typeof initializeAnalysis === "function") {
+
+        await initializeAnalysis();
+
+    }
+
+    if (typeof initializeFirebase === "function") {
+
+        await initializeFirebase();
+
+    }
+
+    if (typeof initializeCamera === "function") {
+
+        initializeCamera();
+
+    }
+
+    SSPRO.modules = {
+
+        analysis: true,
+
+        camera: true,
+
+        firebase: true
 
     };
 
-    reader.readAsText(file);
+}
+
+/* ==========================================
+   Events
+========================================== */
+
+function bindEvents() {
+
+    $("#analysisSport")?.addEventListener(
+
+        "change",
+
+        changeSport
+
+    );
 
 }
 
-/* ===========================================
-   초기화
-=========================================== */
+/* ==========================================
+   Sport
+========================================== */
 
-function resetAllData(){
+function changeSport(e) {
 
-    if(
+    SSPRO.currentSport = e.target.value;
 
-    !confirm(
+    Analysis.sport = SSPRO.currentSport;
 
-    "모든 데이터를 삭제하시겠습니까?"
+    showToast(
 
-    )
+        SSPRO.currentSport +
 
-    ){
+        " 분석 모드"
 
-    return;
+    );
+
+}
+
+/* ==========================================
+   Load
+========================================== */
+
+function loadApplication() {
+
+    renderAthleteTable();
+
+    updateDashboard();
+
+    refreshApp();
+
+}
+
+/* ==========================================
+   Export
+========================================== */
+
+window.SSPRO = SSPRO;
+
+console.log(
+
+    "🏆 SSPRO Controller Loaded"
+
+);
+/* ==========================================
+   Module Health Check
+========================================== */
+
+function checkModules() {
+
+    const modules = {
+
+        main: typeof App !== "undefined",
+
+        analysis: typeof Analysis !== "undefined",
+
+        camera: typeof CameraSystem !== "undefined",
+
+        comparison: typeof Compare !== "undefined",
+
+        report: typeof Report !== "undefined",
+
+        athlete: typeof Athlete !== "undefined",
+
+        biathlon: typeof Biathlon !== "undefined",
+
+        college: typeof College !== "undefined"
+
+    };
+
+    console.table(modules);
+
+    return modules;
+
+}
+
+/* ==========================================
+   Diagnostics
+========================================== */
+
+function runDiagnostics() {
+
+    const result = checkModules();
+
+    const failed = Object.entries(result)
+
+        .filter(([_, ok]) => !ok);
+
+    if (failed.length === 0) {
+
+        showToast("✅ 모든 모듈 정상");
+
+    } else {
+
+        console.warn("누락된 모듈", failed);
+
+        showToast("⚠ 일부 모듈 확인 필요", "error");
 
     }
 
-    localStorage.removeItem(
-
-    STORAGE_KEY
-
-    );
-
-    location.reload();
-
 }
 
-/* ===========================================
-   시작
-=========================================== */
+/* ==========================================
+   Auto Save
+========================================== */
 
-document.addEventListener(
+setInterval(() => {
 
-"DOMContentLoaded",
+    if (typeof saveStorage === "function") {
 
-()=>{
-
-    loadData();
-
-    updateFirebaseStatus();
-
-});
-/* ===========================================
-   app.js Part 3
-   Athlete Manager
-=========================================== */
-
-/* ===========================================
-   UUID
-=========================================== */
-
-function createId(){
-
-    return "id-" +
-
-    Date.now() +
-
-    "-" +
-
-    Math.random()
-
-    .toString(36)
-
-    .substring(2,8);
-
-}
-
-/* ===========================================
-   Athlete
-=========================================== */
-
-function addAthlete(data){
-
-    data.id=createId();
-
-    data.createdAt=
-
-    new Date().toISOString();
-
-    app.athletes.push(data);
-
-    saveData();
-
-    renderAthleteSelect();
-
-}
-
-/* ===========================================
-   Delete
-=========================================== */
-
-function deleteAthlete(id){
-
-    app.athletes=
-
-    app.athletes.filter(
-
-    athlete=>
-
-    athlete.id!==id
-
-    );
-
-    saveData();
-
-    renderAthleteSelect();
-
-}
-
-/* ===========================================
-   Find
-=========================================== */
-
-function getAthlete(id){
-
-    return app.athletes.find(
-
-    athlete=>
-
-    athlete.id===id
-
-    );
-
-}
-
-/* ===========================================
-   Select Box
-=========================================== */
-
-function renderAthleteSelect(){
-
-    const ids=[
-
-    "sportsAthleteSelect",
-
-    "weightAthleteSelect",
-
-    "cameraAthleteSelect",
-
-    "reportAthleteSelect"
-
-    ];
-
-    ids.forEach(id=>{
-
-        const select=
-
-        document.getElementById(id);
-
-        if(!select)return;
-
-        select.innerHTML=
-
-        `<option value="">선수 선택</option>`;
-
-        app.athletes.forEach(
-
-        athlete=>{
-
-            select.innerHTML+=`
-
-<option value="${athlete.id}">
-
-${athlete.name}
-
-</option>
-
-`;
-
-        });
-
-    });
-
-}
-
-/* ===========================================
-   Dashboard Count
-=========================================== */
-
-function refreshDashboard(){
-
-    const athlete=
-
-    document.getElementById(
-
-    "dashboardAthleteCount"
-
-    );
-
-    const sports=
-
-    document.getElementById(
-
-    "dashboardSportsCount"
-
-    );
-
-    const weight=
-
-    document.getElementById(
-
-    "dashboardWeightCount"
-
-    );
-
-    const pose=
-
-    document.getElementById(
-
-    "dashboardPoseCount"
-
-    );
-
-    if(athlete)
-
-    athlete.innerHTML=
-
-    app.athletes.length;
-
-    if(sports)
-
-    sports.innerHTML=
-
-    app.sports.length;
-
-    if(weight)
-
-    weight.innerHTML=
-
-    app.weights.length;
-
-    if(pose)
-
-    pose.innerHTML=
-
-    app.poses.length;
-
-}
-
-/* ===========================================
-   최근훈련
-=========================================== */
-
-function refreshRecentTraining(){
-
-    const list=
-
-    document.getElementById(
-
-    "recentTrainingList"
-
-    );
-
-    if(!list)return;
-
-    list.innerHTML="";
-
-    const recent=[
-
-        ...app.sports,
-
-        ...app.weights,
-
-        ...app.poses
-
-    ]
-
-    .sort(
-
-    (a,b)=>
-
-    new Date(b.date)-
-
-    new Date(a.date)
-
-    )
-
-    .slice(0,5);
-
-    if(recent.length===0){
-
-        list.innerHTML=
-
-        "<li>기록이 없습니다.</li>";
-
-        return;
+        saveStorage();
 
     }
 
-    recent.forEach(item=>{
+}, 30000);
 
-        list.innerHTML+=`
+/* ==========================================
+   App Information
+========================================== */
 
-<li>
+function showAppInfo() {
 
-<strong>${item.name||item.type}</strong>
+    openModal(
 
-<br>
+        "프로젝트 정보",
 
-${item.date}
+        `
+        <h3>Seolcheon Sports Science Center PRO</h3>
 
-</li>
+        <p>Version : ${SSPRO.version}</p>
 
-`;
+        <p>AI Engine : MediaPipe Pose</p>
 
-    });
+        <p>지원 종목 : 바이애슬론, 육상, 농구, 축구, 체대입시</p>
 
-}
-
-/* ===========================================
-   Dashboard Update
-=========================================== */
-
-function updateDashboard(){
-
-    refreshDashboard();
-
-    refreshRecentTraining();
-
-}
-/* ===========================================
-   app.js Part 4
-   Athlete CRUD
-=========================================== */
-
-/* ===========================================
-   Save Athlete
-=========================================== */
-
-const saveAthleteButton =
-document.getElementById(
-"saveAthleteButton"
-);
-
-saveAthleteButton?.addEventListener(
-
-"click",
-
-()=>{
-
-const name=
-
-document.getElementById(
-"athleteName"
-).value.trim();
-
-const gender=
-
-document.getElementById(
-"athleteGender"
-).value;
-
-const birth=
-
-document.getElementById(
-"athleteBirth"
-).value;
-
-const event=
-
-document.getElementById(
-"athleteEvent"
-).value;
-
-const height=
-
-Number(
-
-document.getElementById(
-"athleteHeight"
-).value
-
-);
-
-const weight=
-
-Number(
-
-document.getElementById(
-"athleteWeight"
-).value
-
-);
-
-if(name===""){
-
-toast(
-
-"이름을 입력하세요",
-
-"error"
-
-);
-
-return;
+        <p>개발 상태 : Beta</p>
+        `
+    );
 
 }
 
-const athlete={
+/* ==========================================
+   Startup
+========================================== */
 
-id:createId(),
+window.addEventListener("load", () => {
 
-name,
+    setTimeout(() => {
 
-gender,
+        runDiagnostics();
 
-birth,
-
-event,
-
-height,
-
-weight,
-
-created:
-
-new Date()
-
-.toISOString()
-
-};
-
-app.athletes.push(
-
-athlete
-
-);
-
-saveData();
-
-renderAthleteTable();
-
-renderAthleteSelect();
-
-updateDashboard();
-
-toast(
-
-"선수 등록 완료"
-
-);
-
-resetAthleteForm();
-
-}
-
-);
-
-/* ===========================================
-   Reset
-=========================================== */
-
-function resetAthleteForm(){
-
-document.getElementById(
-
-"athleteName"
-
-).value="";
-
-document.getElementById(
-
-"athleteBirth"
-
-).value="";
-
-document.getElementById(
-
-"athleteEvent"
-
-).value="";
-
-document.getElementById(
-
-"athleteHeight"
-
-).value="";
-
-document.getElementById(
-
-"athleteWeight"
-
-).value="";
-
-}
-
-/* ===========================================
-   Table
-=========================================== */
-
-function renderAthleteTable(){
-
-const tbody=
-
-document.getElementById(
-
-"athleteTableBody"
-
-);
-
-if(!tbody)return;
-
-tbody.innerHTML="";
-
-app.athletes.forEach(
-
-athlete=>{
-
-tbody.innerHTML+=`
-
-<tr>
-
-<td>${athlete.name}</td>
-
-<td>${athlete.gender}</td>
-
-<td>${athlete.event}</td>
-
-<td>${athlete.height}</td>
-
-<td>${athlete.weight}</td>
-
-<td>
-
-<button
-
-onclick="editAthlete('${athlete.id}')">
-
-수정
-
-</button>
-
-<button
-
-class="danger"
-
-onclick="removeAthlete('${athlete.id}')">
-
-삭제
-
-</button>
-
-</td>
-
-</tr>
-
-`;
-
-}
-
-);
-
-}
-
-/* ===========================================
-   Delete
-=========================================== */
-
-function removeAthlete(id){
-
-if(
-
-!confirm(
-
-"삭제하시겠습니까?"
-
-)
-
-){
-
-return;
-
-}
-
-app.athletes=
-
-app.athletes.filter(
-
-a=>a.id!==id
-
-);
-
-saveData();
-
-renderAthleteTable();
-
-renderAthleteSelect();
-
-updateDashboard();
-
-toast(
-
-"삭제 완료"
-
-);
-
-}
-
-/* ===========================================
-   Edit
-=========================================== */
-
-function editAthlete(id){
-
-const athlete=
-
-getAthlete(id);
-
-if(!athlete)return;
-
-document.getElementById(
-
-"athleteName"
-
-).value=
-
-athlete.name;
-
-document.getElementById(
-
-"athleteGender"
-
-).value=
-
-athlete.gender;
-
-document.getElementById(
-
-"athleteBirth"
-
-).value=
-
-athlete.birth;
-
-document.getElementById(
-
-"athleteEvent"
-
-).value=
-
-athlete.event;
-
-document.getElementById(
-
-"athleteHeight"
-
-).value=
-
-athlete.height;
-
-document.getElementById(
-
-"athleteWeight"
-
-).value=
-
-athlete.weight;
-
-removeAthlete(id);
-
-}
-
-/* ===========================================
-   Start
-=========================================== */
-
-document.addEventListener(
-
-"DOMContentLoaded",
-
-()=>{
-
-renderAthleteTable();
-
-renderAthleteSelect();
+    }, 1500);
 
 });
