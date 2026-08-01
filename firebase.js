@@ -1,462 +1,260 @@
-/*
-=========================================
-firebase.js
-설천고 스포츠과학센터 PRO
-Firebase Engine
-=========================================
-*/
+/* ==========================================
+   Firebase Module
+========================================== */
 
 "use strict";
 
-import { initializeApp } from
-"https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+/* ==========================================
+   Firebase Config
+========================================== */
 
-import {
+const firebaseConfig = {
 
-    getFirestore,
+    apiKey: "",
 
-    collection,
+    authDomain: "",
 
-    addDoc,
+    projectId: "",
 
-    getDocs,
+    storageBucket: "",
 
-    doc,
+    messagingSenderId: "",
 
-    updateDoc,
-
-    deleteDoc,
-
-    serverTimestamp
-
-} from
-"https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-
-const firebaseConfig={
-
-    apiKey:"YOUR_API_KEY",
-
-    authDomain:"YOUR_PROJECT.firebaseapp.com",
-
-    projectId:"YOUR_PROJECT",
-
-    storageBucket:"YOUR_PROJECT.appspot.com",
-
-    messagingSenderId:"",
-
-    appId:""
+    appId: ""
 
 };
 
-const app=
+/* ==========================================
+   Initialize
+========================================== */
 
-initializeApp(firebaseConfig);
+let db = null;
 
-export const db=
+async function initializeFirebase() {
 
-getFirestore(app);
+    try {
 
-export class FirebaseManager{
+        firebase.initializeApp(firebaseConfig);
 
-    constructor(){
+        db = firebase.firestore();
 
-        this.playerCollection=
-
-        "athletes";
-
-        this.analysisCollection=
-
-        "analysis";
+        showToast("Firebase 연결 완료");
 
     }
 
-    /* ============================== */
+    catch (error) {
 
-    async saveAthlete(data){
+        console.error(error);
 
-        return await addDoc(
-
-            collection(
-
-                db,
-
-                this.playerCollection
-
-            ),
-
-            {
-
-                ...data,
-
-                createdAt:
-
-                serverTimestamp()
-
-            }
-
-        );
-
-    }
-
-    /* ============================== */
-
-    async saveAnalysis(data){
-
-        return await addDoc(
-
-            collection(
-
-                db,
-
-                this.analysisCollection
-
-            ),
-
-            {
-
-                ...data,
-
-                createdAt:
-
-                serverTimestamp()
-
-            }
-
-        );
-
-    }
-
-    /* ============================== */
-
-    async loadAthletes(){
-
-        const snap=
-
-        await getDocs(
-
-            collection(
-
-                db,
-
-                this.playerCollection
-
-            )
-
-        );
-
-        return snap.docs.map(
-
-            d=>({
-
-                id:d.id,
-
-                ...d.data()
-
-            })
-
-        );
+        showToast("Firebase 연결 실패","error");
 
     }
 
 }
-    /* ============================== */
-    /* Update Athlete */
-    /* ============================== */
 
-    async updateAthlete(id,data){
+/* ==========================================
+   Save Athlete
+========================================== */
 
-        const ref=
+async function saveAthleteCloud(athlete) {
 
-        doc(
+    if (!db) return;
 
-            db,
+    try {
 
-            this.playerCollection,
+        await db.collection("athletes").add(athlete);
 
-            id
-
-        );
-
-        await updateDoc(
-
-            ref,
-
-            data
-
-        );
+        showToast("선수 저장 완료");
 
     }
 
-    /* ============================== */
-    /* Delete Athlete */
-    /* ============================== */
+    catch (error) {
 
-    async deleteAthlete(id){
-
-        const ref=
-
-        doc(
-
-            db,
-
-            this.playerCollection,
-
-            id
-
-        );
-
-        await deleteDoc(
-
-            ref
-
-        );
+        console.error(error);
 
     }
 
-    /* ============================== */
-    /* Search Athlete */
-    /* ============================== */
+}
 
-    async searchAthlete(keyword){
+/* ==========================================
+   Save Analysis
+========================================== */
 
-        const athletes=
+async function saveAnalysisCloud(data) {
 
-        await this.loadAthletes();
+    if (!db) return;
 
-        return athletes.filter(item=>
+    try {
 
-            item.name
-
-            ?.toLowerCase()
-
-            .includes(
-
-                keyword.toLowerCase()
-
-            )
-
-        );
+        await db.collection("analysis").add(data);
 
     }
 
-    /* ============================== */
-    /* Save Training */
-    /* ============================== */
+    catch (error) {
 
-    async saveTraining(data){
-
-        return await addDoc(
-
-            collection(
-
-                db,
-
-                "training"
-
-            ),
-
-            {
-
-                ...data,
-
-                createdAt:
-
-                serverTimestamp()
-
-            }
-
-        );
+        console.error(error);
 
     }
 
-    /* ============================== */
-    /* Load Training */
-    /* ============================== */
+}
+/* ==========================================
+   Load Athletes
+========================================== */
 
-    async loadTraining(){
+async function loadAthletesCloud() {
 
-        const snap=
+    if (!db) return;
 
-        await getDocs(
+    try {
 
-            collection(
+        const snapshot =
 
-                db,
+            await db.collection("athletes").get();
 
-                "training"
+        App.athletes = [];
 
-            )
+        snapshot.forEach(doc => {
 
-        );
+            App.athletes.push({
 
-        return snap.docs.map(doc=>({
+                id: doc.id,
 
-            id:doc.id,
+                ...doc.data()
 
-            ...doc.data()
+            });
 
-        }));
+        });
 
-    }
+        if (typeof renderAthleteTable === "function") {
 
-    /* ============================== */
-    /* Save Report */
-    /* ============================== */
+            renderAthleteTable();
 
-    async saveReport(data){
+        }
 
-        return await addDoc(
+        updateDashboard();
 
-            collection(
-
-                db,
-
-                "reports"
-
-            ),
-
-            {
-
-                ...data,
-
-                createdAt:
-
-                serverTimestamp()
-
-            }
-
-        );
+        showToast("선수 데이터 불러오기 완료");
 
     }
 
-    /* ============================== */
-    /* Load Reports */
-    /* ============================== */
+    catch (error) {
 
-    async loadReports(){
+        console.error(error);
 
-        const snap=
-
-        await getDocs(
-
-            collection(
-
-                db,
-
-                "reports"
-
-            )
-
-        );
-
-        return snap.docs.map(doc=>({
-
-            id:doc.id,
-
-            ...doc.data()
-
-        }));
+        showToast("선수 데이터 불러오기 실패","error");
 
     }
 
-    /* ============================== */
-    /* Favorite Athlete */
-    /* ============================== */
+}
 
-    async favoriteAthlete(id){
+/* ==========================================
+   Load Analysis
+========================================== */
 
-        const ref=
+async function loadAnalysisCloud() {
 
-        doc(
+    if (!db) return;
 
-            db,
+    try {
 
-            this.playerCollection,
+        const snapshot =
 
-            id
+            await db.collection("analysis").get();
 
-        );
+        App.analysis = [];
 
-        await updateDoc(
+        snapshot.forEach(doc => {
 
-            ref,
+            App.analysis.push({
 
-            {
+                id: doc.id,
 
-                favorite:true
+                ...doc.data()
 
-            }
+            });
 
-        );
+        });
 
-    }
+        refreshApp();
 
-    /* ============================== */
-    /* Remove Favorite */
-    /* ============================== */
-
-    async unfavoriteAthlete(id){
-
-        const ref=
-
-        doc(
-
-            db,
-
-            this.playerCollection,
-
-            id
-
-        );
-
-        await updateDoc(
-
-            ref,
-
-            {
-
-                favorite:false
-
-            }
-
-        );
+        showToast("분석 데이터 불러오기 완료");
 
     }
 
-    /* ============================== */
-    /* Dashboard Count */
-    /* ============================== */
+    catch (error) {
 
-    async getDashboardInfo(){
-
-        const athletes=
-
-        await this.loadAthletes();
-
-        const trainings=
-
-        await this.loadTraining();
-
-        const reports=
-
-        await this.loadReports();
-
-        return{
-
-            athleteCount:
-
-            athletes.length,
-
-            trainingCount:
-
-            trainings.length,
-
-            reportCount:
-
-            reports.length
-
-        };
+        console.error(error);
 
     }
+
+}
+
+/* ==========================================
+   Delete Athlete
+========================================== */
+
+async function deleteAthleteCloud(id) {
+
+    if (!db) return;
+
+    try {
+
+        await db.collection("athletes")
+
+            .doc(id)
+
+            .delete();
+
+        showToast("선수 삭제 완료");
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        showToast("삭제 실패","error");
+
+    }
+
+}
+
+/* ==========================================
+   Update Athlete
+========================================== */
+
+async function updateAthleteCloud(id,data){
+
+    if(!db) return;
+
+    try{
+
+        await db.collection("athletes")
+
+            .doc(id)
+
+            .update(data);
+
+        showToast("선수 수정 완료");
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+    }
+
+}
+
+/* ==========================================
+   Sync
+========================================== */
+
+async function syncCloud(){
+
+    await loadAthletesCloud();
+
+    await loadAnalysisCloud();
 
 }
