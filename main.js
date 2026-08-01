@@ -4962,7 +4962,7 @@ async function startLiveCamera() {
                     audio: false,
 
                     video: {
-                        facingMode: "user",
+                        facingMode: currentFacingMode,
 
                         width: {
                             ideal: 1280
