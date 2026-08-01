@@ -1,433 +1,318 @@
 /* ==========================================
-   PDF Module
+   Polar BLE Module
 ========================================== */
 
 "use strict";
 
-const PDFReport = {
+const PolarBLE={
 
-    title: "Seolcheon Sports Science Center",
+    device:null,
 
-    author: "SSPRO",
+    server:null,
 
-    version: "3.0"
+    service:null,
+
+    characteristic:null,
+
+    connected:false,
+
+    heartRate:0,
+
+    battery:0
 
 };
 
 /* ==========================================
-   Export PDF
+   Connect
 ========================================== */
 
-async function exportAnalysisPDF(){
+async function connectPolar(){
 
-    const doc = new jspdf.jsPDF({
+    try{
 
-        orientation:"portrait",
+        PolarBLE.device=
 
-        unit:"mm",
+            await navigator.bluetooth.requestDevice({
 
-        format:"a4"
+                filters:[
+
+                    {
+
+                        services:[
+
+                            "heart_rate"
+
+                        ]
+
+                    }
+
+                ]
+
+            });
+
+        PolarBLE.server=
+
+            await PolarBLE.device.gatt.connect();
+
+        PolarBLE.service=
+
+            await PolarBLE.server
+
+            .getPrimaryService(
+
+                "heart_rate"
+
+            );
+
+        PolarBLE.characteristic=
+
+            await PolarBLE.service
+
+            .getCharacteristic(
+
+                "heart_rate_measurement"
+
+            );
+
+        await PolarBLE.characteristic
+
+            .startNotifications();
+
+        PolarBLE.characteristic
+
+            .addEventListener(
+
+                "characteristicvaluechanged",
+
+                heartRateChanged
+
+            );
+
+        PolarBLE.connected=true;
+
+        showToast("Polar 연결 성공");
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+        showToast("Polar 연결 실패","error");
+
+    }
+
+}
+
+/* ==========================================
+   Disconnect
+========================================== */
+
+function disconnectPolar(){
+
+    if(
+
+        PolarBLE.device &&
+
+        PolarBLE.device.gatt.connected
+
+    ){
+
+        PolarBLE.device.gatt.disconnect();
+
+    }
+
+    PolarBLE.connected=false;
+
+    showToast("Polar 연결 종료");
+
+}
+
+/* ==========================================
+   Heart Rate Event
+========================================== */
+
+function heartRateChanged(event){
+
+    const value=
+
+        event.target.value;
+
+    PolarBLE.heartRate=
+
+        value.getUint8(1);
+
+    updateHeartRateUI();
+
+}
+/* ==========================================
+   Heart Rate Zone
+========================================== */
+
+const HeartZone={
+
+    zone:1,
+
+    maxHR:200
+
+};
+
+function calculateHeartZone(){
+
+    const hr=
+
+        PolarBLE.heartRate;
+
+    const percent=
+
+        hr/
+
+        HeartZone.maxHR*100;
+
+    if(percent<60){
+
+        HeartZone.zone=1;
+
+    }
+
+    else if(percent<70){
+
+        HeartZone.zone=2;
+
+    }
+
+    else if(percent<80){
+
+        HeartZone.zone=3;
+
+    }
+
+    else if(percent<90){
+
+        HeartZone.zone=4;
+
+    }
+
+    else{
+
+        HeartZone.zone=5;
+
+    }
+
+    return HeartZone.zone;
+
+}
+
+/* ==========================================
+   Training Intensity
+========================================== */
+
+function getTrainingIntensity(){
+
+    switch(
+
+        calculateHeartZone()
+
+    ){
+
+        case 1:
+
+            return "회복";
+
+        case 2:
+
+            return "유산소";
+
+        case 3:
+
+            return "지구력";
+
+        case 4:
+
+            return "고강도";
+
+        case 5:
+
+            return "최대";
+
+    }
+
+}
+
+/* ==========================================
+   Estimated Calories
+========================================== */
+
+function estimateCalories(){
+
+    const minutes=
+
+        Session.duration/60;
+
+    return Math.round(
+
+        PolarBLE.heartRate*
+
+        0.12*
+
+        minutes
+
+    );
+
+}
+
+/* ==========================================
+   Update UI
+========================================== */
+
+function updateHeartRateUI(){
+
+    $("#heartRate").textContent=
+
+        PolarBLE.heartRate;
+
+    $("#heartZone").textContent=
+
+        "Zone "+
+
+        calculateHeartZone();
+
+    $("#heartIntensity").textContent=
+
+        getTrainingIntensity();
+
+    $("#calorie").textContent=
+
+        estimateCalories();
+
+}
+
+/* ==========================================
+   History
+========================================== */
+
+const HeartHistory=[];
+
+function saveHeartRate(){
+
+    HeartHistory.push({
+
+        time:Date.now(),
+
+        heartRate:PolarBLE.heartRate
 
     });
 
-    doc.setFontSize(20);
+    if(
 
-    doc.text(
+        HeartHistory.length>
 
-        "Sports Science Report",
+        500
 
-        20,
+    ){
 
-        20
+        HeartHistory.shift();
 
-    );
-
-    doc.setFontSize(12);
-
-    doc.text(
-
-        "Athlete : " +
-
-        ($("#athleteName")?.value || "-"),
-
-        20,
-
-        35
-
-    );
-
-    doc.text(
-
-        "Sport : " +
-
-        Analysis.sport,
-
-        20,
-
-        45
-
-    );
-
-    doc.text(
-
-        "Date : " +
-
-        new Date().toLocaleString(),
-
-        20,
-
-        55
-
-    );
-
-    doc.line(
-
-        20,
-
-        60,
-
-        190,
-
-        60
-
-    );
-
-    addScoreSection(doc);
-
-    addAnalysisSection(doc);
-
-    addRecommendationSection(doc);
-
-    doc.save(
-
-        "Sports_Report.pdf"
-
-    );
-
-}
-/* ==========================================
-   Score Section
-========================================== */
-
-function addScoreSection(doc){
-
-    doc.setFontSize(16);
-
-    doc.text("AI Analysis",20,75);
-
-    doc.setFontSize(11);
-
-    doc.text(
-
-        "AI Score : "+Analysis.score,
-
-        25,
-
-        90
-
-    );
-
-    doc.text(
-
-        "Balance : "+Analysis.balance,
-
-        25,
-
-        100
-
-    );
-
-    doc.text(
-
-        "Posture : "+Analysis.posture,
-
-        25,
-
-        110
-
-    );
-
-    doc.text(
-
-        "Stability : "+Analysis.stability,
-
-        25,
-
-        120
-
-    );
-
-}
-
-/* ==========================================
-   National Compare
-========================================== */
-
-function addAnalysisSection(doc){
-
-    doc.setFontSize(16);
-
-    doc.text(
-
-        "National Comparison",
-
-        20,
-
-        145
-
-    );
-
-    const compare=
-
-        compareScore();
-
-    doc.setFontSize(11);
-
-    doc.text(
-
-        "National : "+compare.score+"%",
-
-        25,
-
-        160
-
-    );
-
-    doc.text(
-
-        "Balance : "+compare.balance+"%",
-
-        25,
-
-        170
-
-    );
-
-    doc.text(
-
-        "Posture : "+compare.posture+"%",
-
-        25,
-
-        180
-
-    );
-
-    doc.text(
-
-        "Stability : "+compare.stability+"%",
-
-        25,
-
-        190
-
-    );
-
-}
-
-/* ==========================================
-   Recommendation
-========================================== */
-
-function addRecommendationSection(doc){
-
-    doc.setFontSize(16);
-
-    doc.text(
-
-        "AI Coach",
-
-        20,
-
-        215
-
-    );
-
-    doc.setFontSize(11);
-
-    const coach=
-
-        createRecommendation();
-
-    let y=230;
-
-    coach.forEach(item=>{
-
-        doc.text(
-
-            "• "+item.title+
-
-            " : "+item.description,
-
-            25,
-
-            y
-
-        );
-
-        y+=10;
-
-    });
-
-}
-/* ==========================================
-   Chart Image
-========================================== */
-
-function addChartToPDF(doc){
-
-    if(!reportChart) return;
-
-    const image=
-
-        reportChart.toBase64Image();
-
-    doc.addImage(
-
-        image,
-
-        "PNG",
-
-        20,
-
-        20,
-
-        170,
-
-        80
-
-    );
-
-}
-
-/* ==========================================
-   Athlete Photo
-========================================== */
-
-function addAthletePhoto(doc){
-
-    const athlete=
-
-        App.athletes.find(
-
-            a=>a.id===Athlete.selected
-
-        );
-
-    if(!athlete) return;
-
-    if(!athlete.photo) return;
-
-    doc.addImage(
-
-        athlete.photo,
-
-        "JPEG",
-
-        150,
-
-        20,
-
-        35,
-
-        45
-
-    );
-
-}
-
-/* ==========================================
-   QR Code
-========================================== */
-
-function addQRCode(doc){
-
-    const canvas=
-
-        document.querySelector("#qrCanvas");
-
-    if(!canvas) return;
-
-    const img=
-
-        canvas.toDataURL("image/png");
-
-    doc.addImage(
-
-        img,
-
-        "PNG",
-
-        155,
-
-        245,
-
-        30,
-
-        30
-
-    );
-
-}
-
-/* ==========================================
-   Signature
-========================================== */
-
-function addSignature(doc){
-
-    doc.setFontSize(10);
-
-    doc.text(
-
-        "Seolcheon Sports Science Center",
-
-        20,
-
-        285
-
-    );
-
-    doc.text(
-
-        "AI Analysis System V3",
-
-        20,
-
-        291
-
-    );
-
-}
-
-/* ==========================================
-   Final Export
-========================================== */
-
-async function createPDF(){
-
-    const doc=
-
-        new jspdf.jsPDF();
-
-    addChartToPDF(doc);
-
-    addAthletePhoto(doc);
-
-    addScoreSection(doc);
-
-    addAnalysisSection(doc);
-
-    addRecommendationSection(doc);
-
-    addQRCode(doc);
-
-    addSignature(doc);
-
-    doc.save(
-
-        "SportsScienceReport.pdf"
-
-    );
+    }
 
 }
