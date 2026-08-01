@@ -1,1012 +1,843 @@
-/* ===========================================
-   sports.js Part 1
-   설천고 스포츠과학 훈련센터
-   종목훈련 관리
-=========================================== */
+/*
+=========================================
+sports.js
+설천고 스포츠과학센터 PRO
+Sports Engine
+Version 2.0
+=========================================
+*/
 
 "use strict";
 
-/* ===========================================
-   Sports Module
-=========================================== */
+export class SportsEngine{
 
-const sportsModule = {
+    constructor(){
 
-    editingId: null,
+        this.category="winter";
 
-    currentCategory: "winter"
+        this.currentSport="biathlon";
 
-};
+        this.sports={
 
-/* ===========================================
-   종목 분류
-=========================================== */
+            winter:[
 
-const SPORTS = {
+                "바이애슬론",
+                "크로스컨트리",
+                "알파인",
+                "스노보드",
+                "프리스타일",
+                "스키점프",
+                "노르딕복합",
+                "봅슬레이",
+                "스켈레톤",
+                "루지",
+                "컬링",
+                "쇼트트랙",
+                "스피드스케이팅",
+                "피겨"
 
-    winter: [
+            ],
 
-        "바이애슬론",
-        "크로스컨트리",
-        "롤러스키",
-        "알파인스키",
-        "스노보드",
-        "스키점프",
-        "노르딕복합",
-        "프리스타일",
-        "컬링",
-        "루지",
-        "봅슬레이",
-        "스켈레톤",
-        "쇼트트랙",
-        "스피드스케이팅",
-        "피겨스케이팅",
-        "아이스하키"
+            summer:[
 
-    ],
+                "육상",
+                "축구",
+                "농구",
+                "배구",
+                "핸드볼",
+                "유도",
+                "태권도",
+                "레슬링",
+                "수영",
+                "사격",
+                "양궁",
+                "체조",
+                "테니스",
+                "배드민턴",
+                "탁구"
 
-    summer:[
+            ],
 
-        "육상",
-        "축구",
-        "농구",
-        "배구",
-        "야구",
-        "핸드볼",
-        "럭비",
-        "수영",
-        "다이빙",
-        "펜싱",
-        "양궁",
-        "사격",
-        "태권도",
-        "유도",
-        "레슬링",
-        "복싱",
-        "체조",
-        "역도",
-        "사이클",
-        "조정",
-        "카누",
-        "철인3종",
-        "탁구",
-        "배드민턴",
-        "테니스",
-        "골프"
+            college:[
 
-    ],
+                "100m",
+                "50m",
+                "제자리멀리뛰기",
+                "서전트점프",
+                "메디신볼",
+                "좌전굴",
+                "윗몸일으키기",
+                "턱걸이",
+                "배근력",
+                "악력"
 
-    college:[
+            ]
 
-        "100m",
-        "200m",
-        "400m",
-        "800m",
-        "1500m",
-        "왕복달리기",
-        "제자리멀리뛰기",
-        "멀리뛰기",
-        "높이뛰기",
-        "턱걸이",
-        "윗몸일으키기",
-        "메디신볼",
-        "배근력",
-        "악력",
-        "좌전굴",
-        "20m왕복달리기"
-
-    ]
-
-};
-
-/* ===========================================
-   DOM
-=========================================== */
-
-const sportsDOM = {
-
-    athlete:
-
-    document.getElementById(
-
-    "sportsAthleteSelect"
-
-    ),
-
-    type:
-
-    document.getElementById(
-
-    "sportsTypeSelect"
-
-    ),
-
-    training:
-
-    document.getElementById(
-
-    "sportsTrainingType"
-
-    ),
-
-    date:
-
-    document.getElementById(
-
-    "sportsDateInput"
-
-    ),
-
-    duration:
-
-    document.getElementById(
-
-    "sportsDurationInput"
-
-    ),
-
-    score:
-
-    document.getElementById(
-
-    "sportsScoreInput"
-
-    ),
-
-    memo:
-
-    document.getElementById(
-
-    "sportsMemoInput"
-
-    ),
-
-    table:
-
-    document.getElementById(
-
-    "sportsTableBody"
-
-    )
-
-};
-
-/* ===========================================
-   종목 목록 출력
-=========================================== */
-
-function loadSports(category){
-
-    sportsModule.currentCategory=
-
-    category;
-
-    if(!sportsDOM.type){
-
-        return;
+        };
 
     }
 
-    sportsDOM.type.innerHTML="";
+    /* ========================= */
 
-    SPORTS[category].forEach(
+    setCategory(category){
 
-        sport=>{
+        this.category=category;
 
-            sportsDOM.type.innerHTML+=`
+        this.render();
 
-<option value="${sport}">
+    }
 
-${sport}
+    /* ========================= */
 
-</option>
+    render(){
 
-`;
+        const list=
+
+        document.getElementById(
+
+            "sportsList"
+
+        );
+
+        if(!list){
+
+            return;
 
         }
 
-    );
+        list.innerHTML="";
+
+        this.sports[
+
+            this.category
+
+        ].forEach(name=>{
+
+            const card=
+
+            document.createElement("div");
+
+            card.className=
+
+            "sport-card";
+
+            card.textContent=name;
+
+            card.onclick=()=>{
+
+                this.selectSport(name);
+
+            };
+
+            list.appendChild(card);
+
+        });
+
+    }
+
+    /* ========================= */
+
+    selectSport(name){
+
+        this.currentSport=name;
+
+        document.getElementById(
+
+            "selectedSport"
+
+        ).textContent=name;
+
+    }
 
 }
-/* ===========================================
-   sports.js Part 2
-   훈련 저장 / AI 분석
-=========================================== */
+    /* ========================= */
+    /* National Standard */
+    /* ========================= */
 
-"use strict";
+    loadNationalStandard(){
 
-/* ===========================================
-   Training Load
-=========================================== */
+        this.standard={
 
-function calculateTrainingLoad(duration, rpe){
+            "바이애슬론":{
 
-    duration = Number(duration) || 0;
-    rpe = Number(rpe) || 0;
+                balance:95,
 
-    return duration * rpe;
+                knee:140,
 
-}
+                hip:120
 
-/* ===========================================
-   점수 등급
-=========================================== */
+            },
 
-function getScoreGrade(score){
+            "크로스컨트리":{
 
-    score = Number(score);
+                balance:94,
 
-    if(score >= 97) return "S+";
-    if(score >= 94) return "S";
-    if(score >= 90) return "A+";
-    if(score >= 85) return "A";
-    if(score >= 80) return "B+";
-    if(score >= 75) return "B";
-    if(score >= 70) return "C";
-    return "D";
+                knee:135,
 
-}
+                hip:118
 
-/* ===========================================
-   AI 피드백
-=========================================== */
+            },
 
-function createAnalysis(score){
+            "사격":{
 
-    score = Number(score);
+                balance:99,
 
-    if(score >= 95){
+                stability:98
 
-        return{
+            },
 
-            level:"매우 우수",
+            "육상":{
 
-            color:"#29D17C",
+                balance:93,
 
-            comment:"국가대표 수준의 훈련 수행입니다."
+                knee:138,
+
+                hip:118
+
+            }
 
         };
 
     }
 
-    if(score >= 85){
+    /* ========================= */
+    /* Get Standard */
+    /* ========================= */
+
+    getStandard(){
+
+        return this.standard[
+
+            this.currentSport
+
+        ]||null;
+
+    }
+
+    /* ========================= */
+    /* Analyze */
+    /* ========================= */
+
+    analyze(data){
+
+        const standard=
+
+        this.getStandard();
+
+        if(!standard){
+
+            return null;
+
+        }
 
         return{
 
-            level:"우수",
+            balance:
 
-            color:"#00B7FF",
+            data.balance-
 
-            comment:"훈련 수행이 매우 안정적입니다."
+            (standard.balance||0),
+
+            knee:
+
+            data.knee-
+
+            (standard.knee||0),
+
+            hip:
+
+            data.hip-
+
+            (standard.hip||0)
 
         };
 
     }
 
-    if(score >= 75){
+    /* ========================= */
+    /* Sport Icon */
+    /* ========================= */
+
+    getSportIcon(){
+
+        const icons={
+
+            "바이애슬론":"🎿",
+
+            "크로스컨트리":"⛷️",
+
+            "사격":"🎯",
+
+            "육상":"🏃",
+
+            "농구":"🏀",
+
+            "축구":"⚽",
+
+            "배구":"🏐",
+
+            "수영":"🏊",
+
+            "태권도":"🥋",
+
+            "유도":"🥋"
+
+        };
+
+        return icons[
+
+            this.currentSport
+
+        ]||"🏅";
+
+    }
+
+    /* ========================= */
+    /* Update Header */
+    /* ========================= */
+
+    updateHeader(){
+
+        document.getElementById(
+
+            "selectedSport"
+
+        ).innerHTML=
+
+        this.getSportIcon()+
+
+        " "+this.currentSport;
+
+    }
+
+    /* ========================= */
+    /* Change Sport */
+    /* ========================= */
+
+    selectSport(name){
+
+        this.currentSport=name;
+
+        this.updateHeader();
+
+    }
+
+    /* ========================= */
+    /* Recommendation */
+    /* ========================= */
+
+    recommend(){
+
+        switch(this.currentSport){
+
+            case "바이애슬론":
+
+                return [
+
+                    "더블폴링",
+
+                    "사격 안정화",
+
+                    "인터벌"
+
+                ];
+
+            case "사격":
+
+                return [
+
+                    "균형",
+
+                    "호흡",
+
+                    "코어"
+
+                ];
+
+            case "육상":
+
+                return [
+
+                    "스프린트",
+
+                    "점프",
+
+                    "스타트"
+
+                ];
+
+            default:
+
+                return [
+
+                    "기본훈련"
+
+                ];
+
+        }
+
+    }
+        /* ========================= */
+    /* Training Menu */
+    /* ========================= */
+
+    getTrainingMenu(){
+
+        const menu={
+
+            "바이애슬론":[
+
+                "롤러스키",
+
+                "사격",
+
+                "인터벌",
+
+                "근력",
+
+                "회복"
+
+            ],
+
+            "크로스컨트리":[
+
+                "더블폴링",
+
+                "업힐",
+
+                "다운힐",
+
+                "롱디스턴스"
+
+            ],
+
+            "사격":[
+
+                "입사",
+
+                "격발",
+
+                "호흡",
+
+                "조준"
+
+            ],
+
+            "육상":[
+
+                "스타트",
+
+                "가속",
+
+                "최고속도",
+
+                "피니시"
+
+            ]
+
+        };
+
+        return menu[this.currentSport] || [];
+
+    }
+
+    /* ========================= */
+    /* Injury Risk */
+    /* ========================= */
+
+    calculateInjuryRisk(data){
+
+        let risk="낮음";
+
+        if(data.valgus){
+
+            risk="높음";
+
+        }
+
+        else if(data.balance<90){
+
+            risk="보통";
+
+        }
+
+        return risk;
+
+    }
+
+    /* ========================= */
+    /* Training Load */
+    /* ========================= */
+
+    calculateTrainingLoad(duration,rpe){
+
+        const load=duration*rpe;
 
         return{
 
-            level:"보통",
+            load,
 
-            color:"#FFD54A",
+            level:
 
-            comment:"기술과 지구력을 조금 더 향상시키세요."
+            load<200
+
+            ?"낮음"
+
+            :
+
+            load<400
+
+            ?"보통"
+
+            :
+
+            "높음"
 
         };
 
     }
 
-    return{
+    /* ========================= */
+    /* Calories */
+    /* ========================= */
 
-        level:"보완 필요",
+    estimateCalories(weight,time){
 
-        color:"#FF5555",
+        const met={
 
-        comment:"기본기와 자세 교정이 필요합니다."
+            "바이애슬론":11,
 
-    };
+            "크로스컨트리":10,
 
-}
+            "육상":9,
 
-/* ===========================================
-   저장
-=========================================== */
+            "농구":8,
 
-function saveSportsRecord(){
+            "축구":8,
 
-    const athleteId = sportsDOM.athlete.value;
+            "웨이트":6
 
-    if(!athleteId){
+        };
 
-        toast("선수를 선택하세요.","error");
+        const value=
 
-        return;
+        met[this.currentSport]||7;
 
-    }
+        return Math.round(
 
-    const score = Number(sportsDOM.score.value);
+            value*
 
-    const rpe = Math.round(score / 10);
+            weight*
 
-    const record={
+            time/
 
-        id:createId(),
-
-        athleteId,
-
-        sport:sportsDOM.type.value,
-
-        trainingType:
-
-        sportsDOM.training.value,
-
-        date:sportsDOM.date.value,
-
-        duration:Number(
-
-            sportsDOM.duration.value
-
-        ),
-
-        score,
-
-        grade:getScoreGrade(score),
-
-        rpe,
-
-        trainingLoad:
-
-        calculateTrainingLoad(
-
-            sportsDOM.duration.value,
-
-            rpe
-
-        ),
-
-        memo:
-
-        sportsDOM.memo.value,
-
-        createdAt:
-
-        new Date().toISOString()
-
-    };
-
-    app.sports.push(record);
-
-    saveData();
-
-    renderSportsTable();
-
-    updateDashboard();
-
-    updateSportsAnalysis();
-
-    toast(
-
-        "훈련기록 저장 완료"
-
-    );
-
-    resetSportsForm();
-
-}
-/* ===========================================
-   sports.js Part 3
-   기록 출력 / 수정 / 삭제
-=========================================== */
-
-"use strict";
-
-/* ===========================================
-   테이블 출력
-=========================================== */
-
-function renderSportsTable(){
-
-    if(!sportsDOM.table) return;
-
-    sportsDOM.table.innerHTML="";
-
-    app.sports
-
-    .sort((a,b)=>
-
-        new Date(b.date)-new Date(a.date)
-
-    )
-
-    .forEach(record=>{
-
-        const athlete=
-
-        app.athletes.find(
-
-            a=>a.id===record.athleteId
+            60
 
         );
 
-        sportsDOM.table.innerHTML+=`
+    }
 
-<tr>
+    /* ========================= */
+    /* Heart Rate Zone */
+    /* ========================= */
 
-<td>${record.date}</td>
+    calculateHeartRate(age){
 
-<td>${athlete?.name || "-"}</td>
+        const max=220-age;
 
-<td>${record.sport}</td>
+        return{
 
-<td>${record.trainingType}</td>
+            zone1:Math.round(max*0.6),
 
-<td>${record.duration}분</td>
+            zone2:Math.round(max*0.7),
 
-<td>
+            zone3:Math.round(max*0.8),
 
-<span class="badge">
+            zone4:Math.round(max*0.9),
 
-${record.grade}
+            zone5:max
 
-</span>
+        };
 
-</td>
+    }
 
-<td>${record.score}</td>
+    /* ========================= */
+    /* Training Result */
+    /* ========================= */
 
-<td>
+    createTrainingResult(data){
 
-<button
-onclick="editSportsRecord('${record.id}')">
+        return{
 
-수정
+            sport:this.currentSport,
 
-</button>
+            standard:this.getStandard(),
 
-<button
-class="danger"
-onclick="deleteSportsRecord('${record.id}')">
+            recommendation:this.recommend(),
 
-삭제
+            injuryRisk:
 
-</button>
+            this.calculateInjuryRisk(data),
 
-</td>
+            analysis:
 
-</tr>
+            this.analyze(data)
 
-`;
+        };
 
-    });
+    }
+        /* ========================= */
+    /* Motion Analysis */
+    /* ========================= */
 
-}
+    analyzeMotion(landmarks){
 
-/* ===========================================
-   수정
-=========================================== */
+        if(!landmarks){
 
-function editSportsRecord(id){
+            return null;
 
-    const record=
+        }
 
-    app.sports.find(
+        const result={
 
-        item=>item.id===id
+            posture:0,
 
-    );
+            balance:0,
 
-    if(!record) return;
+            efficiency:0,
 
-    sportsModule.editingId=id;
+            symmetry:0
 
-    sportsDOM.athlete.value=
+        };
 
-    record.athleteId;
+        result.posture=
 
-    sportsDOM.type.value=
+        this.calculatePostureScore(
 
-    record.sport;
+            landmarks
 
-    sportsDOM.training.value=
+        );
 
-    record.trainingType;
+        result.balance=
 
-    sportsDOM.date.value=
+        this.calculateBalanceScore(
 
-    record.date;
+            landmarks
 
-    sportsDOM.duration.value=
+        );
 
-    record.duration;
+        result.efficiency=
 
-    sportsDOM.score.value=
+        this.calculateEfficiency(
 
-    record.score;
+            landmarks
 
-    sportsDOM.memo.value=
+        );
 
-    record.memo;
+        result.symmetry=
 
-    toast(
+        this.calculateSymmetry(
 
-        "훈련기록 수정모드"
+            landmarks
 
-    );
+        );
 
-}
+        return result;
 
-/* ===========================================
-   삭제
-=========================================== */
+    }
 
-function deleteSportsRecord(id){
+    /* ========================= */
 
-    if(
+    calculatePostureScore(
 
-        !confirm(
-
-            "훈련기록을 삭제하시겠습니까?"
-
-        )
+        landmarks
 
     ){
 
-        return;
+        let score=100;
+
+        const shoulder=
+
+        Math.abs(
+
+            landmarks[11].y-
+
+            landmarks[12].y
+
+        );
+
+        if(shoulder>0.03){
+
+            score-=10;
+
+        }
+
+        return score;
 
     }
 
-    app.sports=
+    /* ========================= */
 
-    app.sports.filter(
+    calculateBalanceScore(
 
-        item=>item.id!==id
+        landmarks
 
-    );
+    ){
 
-    saveData();
+        let score=100;
 
-    renderSportsTable();
+        const hip=
 
-    updateDashboard();
+        Math.abs(
 
-    toast(
+            landmarks[23].y-
 
-        "삭제 완료"
+            landmarks[24].y
 
-    );
+        );
 
-}
+        if(hip>0.02){
 
-/* ===========================================
-   초기화
-=========================================== */
+            score-=10;
 
-function resetSportsForm(){
+        }
 
-    sportsModule.editingId=null;
-
-    sportsDOM.date.value="";
-
-    sportsDOM.duration.value="";
-
-    sportsDOM.score.value="";
-
-    sportsDOM.memo.value="";
-
-}
-
-/* ===========================================
-   AI 분석
-=========================================== */
-
-function updateSportsAnalysis(){
-
-    const score=
-
-    Number(
-
-        sportsDOM.score.value||0
-
-    );
-
-    const analysis=
-
-    createAnalysis(score);
-
-    const result=
-
-    document.getElementById(
-
-        "sportsAnalysisResult"
-
-    );
-
-    if(!result) return;
-
-    result.innerHTML=`
-
-<h3 style="color:${analysis.color}">
-
-${analysis.level}
-
-</h3>
-
-<p>
-
-${analysis.comment}
-
-</p>
-
-<p>
-
-등급 :
-
-<strong>
-
-${getScoreGrade(score)}
-
-</strong>
-
-</p>
-
-`;
-
-}
-
-/* ===========================================
-   점수 입력
-=========================================== */
-
-sportsDOM.score?.addEventListener(
-
-    "input",
-
-    updateSportsAnalysis
-
-);
-
-/* ===========================================
-   저장 버튼
-=========================================== */
-
-document
-
-.getElementById(
-
-"saveSportsRecordButton"
-
-)
-
-?.addEventListener(
-
-"click",
-
-saveSportsRecord
-
-);
-
-/* ===========================================
-   Export
-=========================================== */
-
-window.renderSportsTable=
-renderSportsTable;
-
-window.editSportsRecord=
-editSportsRecord;
-
-window.deleteSportsRecord=
-deleteSportsRecord;
-/* ===========================================
-   sports.js Part 4
-   스포츠과학 분석
-=========================================== */
-
-"use strict";
-
-/* ===========================================
-   Heart Rate Zone
-=========================================== */
-
-function calculateHeartRateZone(age, heartRate){
-
-    const maxHR = 220 - Number(age);
-
-    const percent = (heartRate / maxHR) * 100;
-
-    if(percent < 60) return "Zone 1";
-
-    if(percent < 70) return "Zone 2";
-
-    if(percent < 80) return "Zone 3";
-
-    if(percent < 90) return "Zone 4";
-
-    return "Zone 5";
-
-}
-
-/* ===========================================
-   TRIMP
-=========================================== */
-
-function calculateTRIMP(duration,rpe){
-
-    duration = Number(duration)||0;
-
-    rpe = Number(rpe)||0;
-
-    return Math.round(duration*rpe*1.5);
-
-}
-
-/* ===========================================
-   Calories
-=========================================== */
-
-function calculateCalories(weight,duration,met){
-
-    weight = Number(weight)||0;
-
-    duration = Number(duration)||0;
-
-    met = Number(met)||8;
-
-    return Math.round(
-
-        met *
-
-        weight *
-
-        (duration/60)
-
-    );
-
-}
-
-/* ===========================================
-   평균속도
-=========================================== */
-
-function calculateAverageSpeed(distance,time){
-
-    distance = Number(distance)||0;
-
-    time = Number(time)||0;
-
-    if(time===0){
-
-        return 0;
+        return score;
 
     }
 
-    return Number(
+    /* ========================= */
 
-        (distance/(time/60))
+    calculateEfficiency(
 
-        .toFixed(2)
+        landmarks
 
-    );
+    ){
 
-}
+        let score=100;
 
-/* ===========================================
-   국가대표 점수
-=========================================== */
+        const knee=
 
-function compareNationalScore(score){
+        Math.abs(
 
-    if(score>=95){
+            landmarks[25].x-
+
+            landmarks[26].x
+
+        );
+
+        if(knee>0.08){
+
+            score-=8;
+
+        }
+
+        return score;
+
+    }
+
+    /* ========================= */
+
+    calculateSymmetry(
+
+        landmarks
+
+    ){
+
+        let score=100;
+
+        const shoulder=
+
+        Math.abs(
+
+            landmarks[11].x-
+
+            landmarks[12].x
+
+        );
+
+        if(shoulder>0.15){
+
+            score-=10;
+
+        }
+
+        return score;
+
+    }
+
+    /* ========================= */
+    /* AI Comment */
+    /* ========================= */
+
+    generateComment(score){
+
+        if(score>=95){
+
+            return "국가대표 수준의 움직임입니다.";
+
+        }
+
+        if(score>=85){
+
+            return "우수한 움직임입니다.";
+
+        }
+
+        if(score>=75){
+
+            return "기본 자세는 좋지만 개선이 필요합니다.";
+
+        }
+
+        return "기본 자세 교정이 필요합니다.";
+
+    }
+
+    /* ========================= */
+    /* Complete */
+    /* ========================= */
+
+    completeAnalysis(
+
+        landmarks,
+
+        athlete
+
+    ){
+
+        const motion=
+
+        this.analyzeMotion(
+
+            landmarks
+
+        );
 
         return{
 
-            level:"국가대표",
+            athlete,
 
-            color:"#29D17C"
+            sport:
+
+            this.currentSport,
+
+            motion,
+
+            comment:
+
+            this.generateComment(
+
+                motion.posture
+
+            ),
+
+            createdAt:
+
+            new Date()
 
         };
 
     }
 
-    if(score>=90){
-
-        return{
-
-            level:"전국대회",
-
-            color:"#00E5FF"
-
-        };
-
-    }
-
-    if(score>=80){
-
-        return{
-
-            level:"선수",
-
-            color:"#FFD54A"
-
-        };
-
-    }
-
-    return{
-
-        level:"기초훈련",
-
-        color:"#FF5555"
-
-    };
-
 }
-
-/* ===========================================
-   AI 추천
-=========================================== */
-
-function createTrainingRecommendation(record){
-
-    const result=[];
-
-    if(record.score<80){
-
-        result.push(
-
-            "기초 기술훈련 증가"
-
-        );
-
-    }
-
-    if(record.trainingLoad<300){
-
-        result.push(
-
-            "훈련부하 증가"
-
-        );
-
-    }
-
-    if(record.trainingLoad>900){
-
-        result.push(
-
-            "회복훈련 권장"
-
-        );
-
-    }
-
-    if(record.grade==="S+"){
-
-        result.push(
-
-            "현재 프로그램 유지"
-
-        );
-
-    }
-
-    return result;
-
-}
-
-/* ===========================================
-   AI 카드
-=========================================== */
-
-function renderTrainingScience(record){
-
-    const target=
-
-    document.getElementById(
-
-    "sportsScience"
-
-    );
-
-    if(!target)return;
-
-    const national=
-
-    compareNationalScore(
-
-        record.score
-
-    );
-
-    target.innerHTML=`
-
-<div class="science-grid">
-
-<div class="science-card">
-
-<h3>Training Load</h3>
-
-<div class="science-value">
-
-${record.trainingLoad}
-
-</div>
-
-</div>
-
-<div class="science-card">
-
-<h3>TRIMP</h3>
-
-<div class="science-value">
-
-${calculateTRIMP(
-
-record.duration,
-
-record.rpe
-
-)}
-
-</div>
-
-</div>
-
-<div class="science-card">
-
-<h3>국가대표 기준</h3>
-
-<div
-
-class="science-value"
-
-style="color:${national.color}"
-
->
-
-${national.level}
-
-</div>
-
-</div>
-
-<div class="science-card">
-
-<h3>AI 추천</h3>
-
-<p>
-
-${createTrainingRecommendation(record).join("<br>")}
-
-</p>
-
-</div>
-
-</div>
-
-`;
-
-}
-
-/* ===========================================
-   Export
-=========================================== */
-
-window.calculateHeartRateZone=
-calculateHeartRateZone;
-
-window.calculateTRIMP=
-calculateTRIMP;
-
-window.calculateCalories=
-calculateCalories;
-
-window.calculateAverageSpeed=
-calculateAverageSpeed;
-
-window.compareNationalScore=
-compareNationalScore;
-
-window.renderTrainingScience=
-renderTrainingScience;
