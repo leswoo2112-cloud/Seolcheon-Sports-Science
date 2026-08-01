@@ -5004,6 +5004,9 @@ async function startLiveCamera() {
         const stopButton =
             $("stopLiveCameraButton");
 
+        const switchButton =
+            $("switchCameraButton");
+            
         const captureButton =
             $("captureLiveButton");
 
@@ -5018,6 +5021,10 @@ async function startLiveCamera() {
             stopButton.disabled = false;
         }
 
+        if (switchButton) {
+            switchButton.disabled = false;
+         }
+        
         if (captureButton) {
             captureButton.disabled = false;
         }
