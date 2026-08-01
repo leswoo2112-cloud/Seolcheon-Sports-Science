@@ -4912,8 +4912,10 @@ function resetLiveAnalysisState() {
 /* =========================================
    카메라 시작
 ========================================= */
+let currentFacingMode = "user";
 
 async function startLiveCamera() {
+
     if (liveAnalysisState.running) {
         showToast(
             "카메라가 이미 실행 중입니다.",
