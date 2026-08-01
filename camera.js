@@ -608,3 +608,202 @@ function isCameraRunning(){
     return CameraSystem.stream!==null;
 
 }
+/* ==========================================
+   Camera Status
+========================================== */
+
+function updateCameraStatus(message){
+
+    const status=document.getElementById("cameraStatus");
+
+    if(status){
+
+        status.textContent=message;
+
+    }
+
+}
+
+/* ==========================================
+   Frame Loop
+========================================== */
+
+let cameraAnimationId=null;
+
+function startFrameLoop(){
+
+    stopFrameLoop();
+
+    const video=$("#cameraVideo");
+
+    function render(){
+
+        if(video && video.readyState>=2){
+
+            if(typeof analyzeFrame==="function"){
+
+                analyzeFrame(video);
+
+            }
+
+        }
+
+        cameraAnimationId=requestAnimationFrame(render);
+
+    }
+
+    render();
+
+}
+
+function stopFrameLoop(){
+
+    if(cameraAnimationId){
+
+        cancelAnimationFrame(cameraAnimationId);
+
+        cameraAnimationId=null;
+
+    }
+
+}
+
+/* ==========================================
+   Device Change
+========================================== */
+
+if(navigator.mediaDevices){
+
+    navigator.mediaDevices.addEventListener(
+
+        "devicechange",
+
+        async()=>{
+
+            await detectDevices();
+
+            showToast("카메라 목록이 업데이트되었습니다.");
+
+        }
+
+    );
+
+}
+
+/* ==========================================
+   Permission
+========================================== */
+
+async function checkCameraPermission(){
+
+    if(!navigator.permissions) return;
+
+    try{
+
+        const permission=
+
+            await navigator.permissions.query({
+
+                name:"camera"
+
+            });
+
+        console.log(
+
+            "Camera Permission :",
+
+            permission.state
+
+        );
+
+    }
+
+    catch(e){
+
+        console.log(e);
+
+    }
+
+}
+
+/* ==========================================
+   Destroy
+========================================== */
+
+function destroyCamera(){
+
+    stopFrameLoop();
+
+    stopCamera();
+
+}
+
+/* ==========================================
+   Restart Complete
+========================================== */
+
+async function restartCamera(){
+
+    stopFrameLoop();
+
+    stopCamera();
+
+    await startCamera();
+
+    startFrameLoop();
+
+}
+
+/* ==========================================
+   Start Camera Override
+========================================== */
+
+const _startCamera=startCamera;
+
+startCamera=async function(){
+
+    await _startCamera();
+
+    startFrameLoop();
+
+    updateCameraStatus("🟢 카메라 연결");
+
+};
+
+/* ==========================================
+   Stop Camera Override
+========================================== */
+
+const _stopCamera=stopCamera;
+
+stopCamera=function(){
+
+    stopFrameLoop();
+
+    _stopCamera();
+
+    updateCameraStatus("🔴 카메라 종료");
+
+};
+
+/* ==========================================
+   Before Unload
+========================================== */
+
+window.addEventListener(
+
+    "beforeunload",
+
+    ()=>{
+
+        destroyCamera();
+
+    }
+
+);
+
+/* ==========================================
+   Camera Ready
+========================================== */
+
+console.log("📷 Camera Module Loaded");
